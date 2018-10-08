@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+      "module": "commonjs",
+      "noImplicitAny": true,
+      "sourceMap": true,
+      "outDir": "../electron-dist",
+      "typeRoots": [
+        "../node_modules/@types"
+      ]
+    },
+    "include": [
+      "**/*"
+    ]
+  }

@@ -1,0 +1,6 @@
+<!-- <input type="file" (change)="onFileChange($event)"> -->
+<input type="file" (change)="onFileChange($event)">
+
+<p *ngFor="let t of transactions">
+  {{ t.payee }}
+</p>
