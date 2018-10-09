@@ -1,0 +1,14 @@
+<h2 class="accounts-header">Accounts</h2>
+
+<div *ngIf="accounts.length > 0">
+  <mat-selection-list #accountSelection>
+    <mat-list-option *ngFor="let account of accounts">
+      {{ account.name }}
+    </mat-list-option>
+  </mat-selection-list>
+
+  <p>
+    Options selected: {{ accountSelection.selectedOptions.selected.length }}
+  </p>
+
+</div>

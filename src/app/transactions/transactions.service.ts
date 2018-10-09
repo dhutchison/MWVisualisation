@@ -3,7 +3,7 @@ import { Transaction } from './shared/transaction.model';
 
 import { Observable, of } from 'rxjs';
 
-declare let electron: any;
+import { ElectronService } from 'ngx-electron';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +11,8 @@ declare let electron: any;
 export class TransactionsService {
 
   dbFilePath: string = '/Users/david/Documents/Bank/MW_Visualisation/persistentStore'
-  private ipc = electron.ipcRenderer;
 
-  constructor() { 
+  constructor(private _electronService: ElectronService) { 
     
     // let filebuffer = fs.readFileSync(this.dbFilePath);
     // this.db = new SQL.Database(filebuffer);
@@ -21,7 +20,8 @@ export class TransactionsService {
 
   configureDB(file: File) {
     console.log(file);
-    this.ipc.send("databaseFileSelected", 'ping')
+    
+    this._electronService.ipcRenderer.send("databaseFileSelected", 'ping')
     // let reader = new FileReader();
     // reader.readAsArrayBuffer(file);
     // reader.onload = () => {

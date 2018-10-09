@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-// declare let electron: any;
+declare let electron: any;
 
 @Component({
   selector: 'app-root',

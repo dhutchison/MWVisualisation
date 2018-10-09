@@ -1,45 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMain } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
-
-// import * as sqlite3 from 'sqlite3';
-
-// const MoneyWellDAO = require('./dao') 
-
-//   const path = require('path')   
-//   const url = require('url')
-
-//   var db;
-
-//   function createWindow () {     
-//     // Create the browser window.     
-//     mainWindow = new BrowserWindow({width: 800, height: 600}) 
-
-//     // and load the index.html of the app.     
-//     mainWindow.loadURL(url.format({      
-//       pathname: path.join(__dirname, 'dist/MW-Visualisation/index.html'),       
-//       protocol: 'file:',      
-//       slashes: true     
-//     }))   
-
-//     // Open the DevTools.
-//     mainWindow.webContents.openDevTools()
-
-//     ipcMain.on("databaseFileSelected", (event, arg) => {
-
-//       console.log('Got:');
-//         console.log(event);
-//         console.log(arg);
-//         //TODO: Hard coded
-
-//     dao = new MoneyWellDAO('/Users/david/Documents/Bank/MW_Visualisation/persistentStore');
-//     let transactions = dao.loadTransactions();
-
-//       console.log(transactions);
-
-//     });
-
-//   } 
 
 let mainWindow: Electron.BrowserWindow;
 
@@ -66,10 +27,22 @@ function createWindow() {
     //TODO: Hard coded
 
     let dao = new MoneyWellDAO('/Users/david/Documents/Bank/MW_Visualisation/persistentStore');
-    let transactions = dao.loadTransactions();
+    dao.connect()
+      .then(() => {
+        dao.loadAccounts()
+          .then(result => {
+            console.log("loaded")
+            console.log(result);
 
-    console.log(transactions);
-
+            event.sender.send("accountsLoaded", result);
+          }, (error) => {
+            console.log("Failed to load accounts: ");
+            console.log(error);
+          });
+      }).catch((error) => {
+        console.log("Failed to connect");
+        console.log(error);
+      });
   });
 
   // Emitted when the window is closed.

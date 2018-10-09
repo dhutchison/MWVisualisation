@@ -4,14 +4,20 @@ export class MoneyWellDAO {
 
     private db:Database;
 
-    constructor(dbFilePath: string) {
-        this.db = new Database(dbFilePath, (err) => {
+    constructor(private dbFilePath: string) { }
+
+    connect(): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this.db = new Database(this.dbFilePath, (err) => {
           if (err) {
               console.log('Could not connect to database', err)
+              reject(err);
           } else {
               console.log('Connected to database')
+              resolve();
           }
         });
+      });
     }
 
     loadTransactions() {
@@ -26,12 +32,16 @@ export class MoneyWellDAO {
     //   }
     }
 
-    get(sql: string, params: any[] = []) {
+    loadAccounts(): Promise<{id: number, name: string}[]> {
+      return this.all("SELECT Z_PK as id, ZNAME as name FROM ZACCOUNT");
+    }
+
+    private get(sql: string, params: any[] = []): Promise<any[]> {
         return new Promise((resolve, reject) => {
           this.db.get(sql, params, (err: any, result: any) => {
             if (err) {
-              console.log('Error running sql: ' + sql)
-              console.log(err)
+              console.error('Error running sql: ' + sql)
+              console.error(err)
               reject(err)
             } else {
               resolve(result)
@@ -40,12 +50,12 @@ export class MoneyWellDAO {
         })
       }
     
-      all(sql:string, params:any[] = []) {
+      private all(sql:string, params:any[] = []): Promise<any[]> {
         return new Promise((resolve, reject) => {
           this.db.all(sql, params, (err: Error, rows: any) => {
             if (err) {
-              console.log('Error running sql: ' + sql)
-              console.log(err)
+              console.error('Error running sql: ' + sql)
+              console.error(err)
               reject(err)
             } else {
               resolve(rows)
