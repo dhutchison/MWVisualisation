@@ -2,12 +2,16 @@ import { Injectable, NgZone } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ElectronService } from 'ngx-electron';
 
+import { Account } from './shared/account.model';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AccountsService {
 
-  accounts = new Subject<{id: number, name: string}[]>();
+  private _selectedAccounts: Account[];
+
+  accounts = new Subject<Account[]>();
 
   constructor(
       private _electronService: ElectronService, 
@@ -29,5 +33,10 @@ export class AccountsService {
         
       });
 
+  }
+
+  set selectedAccounts(value: Account[]) {
+    console.log("Setting selected accounts in service");
+    this._selectedAccounts = value;
   }
 }

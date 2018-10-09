@@ -17,16 +17,6 @@ export class TransactionListComponent implements OnInit {
     this.loadTransactions();
   }
 
-  onFileChange(event: Event) {
-    console.log(event);
-    let inputElement = <HTMLInputElement>event.target;
-    if(inputElement.files && inputElement.files.length > 0) {
-      let file = inputElement.files[0];
-      console.log(file)
-      this.transactionService.configureDB(file);
-    }
-  }
-
   loadTransactions(): void {
     this.transactionService.getTransactions().subscribe(
       transactions => this.transactions = transactions);

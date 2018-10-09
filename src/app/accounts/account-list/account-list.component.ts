@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Output } from '@angular/core';
 import { AccountsService } from '../accounts.service';
 import { Subscription } from 'rxjs';
+import { MatSelectionListChange } from '@angular/material/list';
 
 @Component({
   selector: 'app-account-list',
@@ -25,6 +26,18 @@ export class AccountListComponent implements OnInit, OnDestroy {
         console.log(this.accounts);
       }
     );
+  }
+
+  onSelectionChanged(event: MatSelectionListChange): void {
+
+    let selectedAccounts = [];
+
+    event.source.selectedOptions.selected.forEach(element => {
+      console.log(element.value);
+      selectedAccounts.push(element.value);
+    });
+
+    this._accountsService.selectedAccounts = selectedAccounts;
   }
 
   ngOnDestroy() {

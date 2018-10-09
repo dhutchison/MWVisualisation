@@ -1,9 +1,11 @@
-import { app, BrowserWindow, ipcMain, IpcMain } from 'electron';
+import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
 
 let mainWindow: Electron.BrowserWindow;
+let menu: Electron.Menu;
 
+let dao: MoneyWellDAO;
 
 function createWindow() {
   // Create the browser window.
@@ -15,36 +17,6 @@ function createWindow() {
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "app/index.html"));
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-
-  // Listen for database file selected events
-  ipcMain.on("databaseFileSelected", (event:any, arg:any) => {
-
-    console.log('Got:');
-    console.log(event);
-    console.log(arg);
-    //TODO: Hard coded
-
-    let dao = new MoneyWellDAO('/Users/david/Documents/Bank/MW_Visualisation/persistentStore');
-    dao.connect()
-      .then(() => {
-        dao.loadAccounts()
-          .then(result => {
-            console.log("loaded")
-            console.log(result);
-
-            event.sender.send("accountsLoaded", result);
-          }, (error) => {
-            console.log("Failed to load accounts: ");
-            console.log(error);
-          });
-      }).catch((error) => {
-        console.log("Failed to connect");
-        console.log(error);
-      });
-  });
-
   // Emitted when the window is closed.
   mainWindow.on("closed", () => {
     // Dereference the window object, usually you would store windows
@@ -54,10 +26,96 @@ function createWindow() {
   });
 }
 
+function openFile () {
+
+  let options: OpenDialogOptions = {
+    properties: ['openFile']
+  };
+
+  dialog.showOpenDialog(mainWindow, options, (filePaths: string[], bookmarks: string[]) => {
+    console.log(filePaths);
+    
+    /* Open the file */
+    dao = new MoneyWellDAO(filePaths[0]);
+    /* Connect to the database */
+    dao.connect()
+      .then(() => {
+        /* On connect, initially load the accounts */
+        dao.loadAccounts()
+          .then(result => {
+            console.log("loaded")
+            console.log(result);
+
+            mainWindow.webContents.send("accountsLoaded", result);
+          }, (error) => {
+            console.log("Failed to load accounts: ");
+            console.log(error);
+          });
+      }).catch((error) => {
+        console.log("Failed to connect");
+        console.log(error);
+      });
+
+  }); 
+ 
+ }
+
+function createMenu() {
+  const template: Electron.MenuItemConstructorOptions[] = [
+    {
+      label: 'File',
+      submenu: [
+        { 
+          label: 'Open File', 
+          click () { openFile(); }
+        }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forcereload' },
+        { role: 'toggledevtools' },
+        { type: 'separator' },
+        { role: 'resetzoom' },
+        { role: 'zoomin' },
+        { role: 'zoomout' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    }
+  ];
+
+  /* From the electron docs, get the standard mac application name menu back */
+  if (process.platform === 'darwin') {
+    template.unshift({
+      label: app.getName(),
+      submenu: [
+        {role: 'about'},
+        {type: 'separator'},
+        {role: 'services', submenu: []},
+        {type: 'separator'},
+        {role: 'hide'},
+        {role: 'hideothers'},
+        {role: 'unhide'},
+        {type: 'separator'},
+        {role: 'quit'}
+      ]
+    });
+  }
+
+  menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+app.on("ready", () => {
+  createWindow();
+  createMenu();
+});
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
