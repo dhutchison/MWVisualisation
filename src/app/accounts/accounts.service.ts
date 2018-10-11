@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ElectronService } from 'ngx-electron';
 
 import { Account } from './shared/account.model';
@@ -11,7 +11,9 @@ export class AccountsService {
 
   private _selectedAccounts: Account[];
 
-  accounts = new Subject<Account[]>();
+  readonly selectedAccountsSubject = new BehaviorSubject<Account[]>([]);
+
+  accounts = new BehaviorSubject<Account[]>([]);
 
   constructor(
       private _electronService: ElectronService, 
@@ -35,8 +37,13 @@ export class AccountsService {
 
   }
 
+  get selectedAccounts(): Account[] {
+    return this._selectedAccounts;
+  }
+
   set selectedAccounts(value: Account[]) {
     console.log("Setting selected accounts in service");
     this._selectedAccounts = value;
+    this.selectedAccountsSubject.next(this._selectedAccounts);
   }
 }

@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 
 import { NgxElectronModule } from 'ngx-electron';
 
+import { NgxMatDrpModule } from 'ngx-mat-daterange-picker';
+
 import { MatListModule } from '@angular/material/list';
 import { MatGridListModule } from '@angular/material/grid-list';
 
@@ -12,17 +14,22 @@ import { TransactionListComponent } from './transactions/transaction-list/transa
 import { AccountListComponent } from './accounts/account-list/account-list.component';
 import { AccountsService } from './accounts/accounts.service';
 import { TransactionsService } from './transactions/transactions.service';
+import { TransactionFilterComponent } from './transactions/transaction-filter/transaction-filter.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TransactionListComponent,
-    AccountListComponent
+    AccountListComponent,
+    TransactionFilterComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     NgxElectronModule,
+
+    /* Material date range picker component */
+    NgxMatDrpModule,
 
     /* Angular Material Components */
     MatListModule,

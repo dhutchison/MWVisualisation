@@ -110,6 +110,22 @@ function createMenu() {
   Menu.setApplicationMenu(menu);
 }
 
+ipcMain.on("loadTransactions", (event:any, args:any) => {
+  if (dao) {
+    /* Only process the request if the DAO has been setup */
+    dao.loadTransactions(args)
+      .then(result => {
+        console.log("loaded transactions")
+        console.log(result);
+
+        mainWindow.webContents.send("transactionsLoaded", result);
+      }, (error) => {
+        console.log("Failed to load transactions: ");
+        console.log(error);
+      });
+  }
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

@@ -20,16 +20,39 @@ export class MoneyWellDAO {
       });
     }
 
-    loadTransactions() {
-        return this.get("SELECT Z_PK, ZDATEYMD, ZAMOUNT, ZPAYEE FROM ZACTIVITY")
-          .then(value => {
-            console.log(value);
-          });
-    //   while (statement.step()) {
-    //     let row = statement.getAsObject();
+    loadTransactions(
+      params: {
+        dateRange: {start: Date, end: Date}, 
+        accounts: {id: number, name: string}[]
+      }): Promise<{id: number, date: Date, payee: String}[]> {
 
-    //     transactions.push({id: row.Z_PK, date: new Date(row.ZDATEYMD), payee: row.ZPAYEE});
-    //   }
+        let queryParams: any[] = [];
+
+        params.accounts.forEach(value => {
+          queryParams.push(value.id);
+        });
+
+        if (params.dateRange) {
+          if (params.dateRange.start) {
+            queryParams.push(params.dateRange.start);
+          }
+          if (params.dateRange.end) {
+            queryParams.push(params.dateRange.end);
+          }
+        }
+
+        let query: string = 
+          'SELECT Z_PK as id, ZDATEYMD as date, ZAMOUNT, ZPAYEE as payee ' + 
+          'FROM ZACTIVITY ' + 
+          'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
+          (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
+          (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
+          'ORDER BY ZDATEYMD DESC'
+
+        console.log(query);
+        console.log(queryParams);
+
+        return this.all(query, queryParams);
     }
 
     loadAccounts(): Promise<{id: number, name: string}[]> {

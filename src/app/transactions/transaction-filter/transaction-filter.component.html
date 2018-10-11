@@ -1,0 +1,10 @@
+<p>
+  transaction-filter works!
+</p>
+
+<ngx-mat-drp 
+  (selectedDateRangeChanged)="updateRange($event)" 
+  [options]="options" 
+  #dateRangePicker>
+</ngx-mat-drp>
+<app-account-list></app-account-list>
