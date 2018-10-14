@@ -1,10 +1,12 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Transaction } from './shared/transaction.model';
+import { Transaction } from '../data/data-access.model';
 
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { ElectronService } from 'ngx-electron';
 import { AccountsService } from '../accounts/accounts.service';
+import { InOutSummary } from '../reports/in-out-report/shared/in-out.model';
+import { DataAccessService } from '../data/data-access.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +14,7 @@ import { AccountsService } from '../accounts/accounts.service';
 export class TransactionsService {
 
   readonly transactions = new BehaviorSubject<Transaction[]>([]);
+  readonly inOutSummary = new BehaviorSubject<InOutSummary[]>([]);
 
   /* Date ranges are yyyyMMdd strings */
   private _filter: {
@@ -21,6 +24,7 @@ export class TransactionsService {
 
   constructor(
     private _accountsService: AccountsService,
+    private _dataAccessService: DataAccessService,
     private _electronService: ElectronService,
     private _ngZone: NgZone) { 
     
@@ -31,21 +35,6 @@ export class TransactionsService {
       this._filter.accounts = value;
       this.reloadTransactions()
     });
-
-    /* Subscribe to the notification from electron that transactions have been loaded */
-    this._electronService.ipcRenderer.on("transactionsLoaded", 
-      (event: any, args: Transaction[]) => {
-
-        /* Need to force this in to the Angular context
-         * See sample project referenced in 
-         * https://github.com/ThorstenHans/ngx-electron/issues/2
-         */
-        this._ngZone.run(() => {
-          this.transactions.next(args);
-        });
-        
-      }
-    );
   }
 
   set dateRange(date: {fromDate: Date, toDate: Date}) {
@@ -78,29 +67,9 @@ export class TransactionsService {
 
     console.log(this._filter);
 
-    /* Send a notification to the electron service to service the request */
-    this._electronService.ipcRenderer.send("loadTransactions", this._filter);
-  }
-
-  getTransactions(): Observable<Transaction[]> {
-
-    // let statement = this.db.prepare("SELECT Z_PK, ZDATEYMD, ZAMOUNT, ZPAYEE FROM ZACTIVITY");
-    // statement.bind()
-
-    // let transactions: Transaction[] = [];
-    // while (statement.step()) {
-    //   let row = statement.getAsObject();
-
-    //   transactions.push({id: row.Z_PK, date: new Date(row.ZDATEYMD), payee: row.ZPAYEE});
-    // }
-
-
-    
-
-    let transactions: Transaction[] = [
-      { id: 1, date: new Date(2018, 10, 1), payee: 'Somebody'}
-    ];
-
-    return of(transactions);
+    this._dataAccessService.loadTransactions(this._filter)
+      .then((result) => {
+        this.transactions.next(result);
+      });
   }
 }

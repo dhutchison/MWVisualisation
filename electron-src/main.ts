@@ -40,6 +40,9 @@ function openFile () {
     /* Connect to the database */
     dao.connect()
       .then(() => {
+        /* Send a message that a file was opened */
+        mainWindow.webContents.send("databaseOpened");
+
         /* On connect, initially load the accounts */
         dao.loadAccounts()
           .then(result => {
@@ -118,11 +121,23 @@ ipcMain.on("loadTransactions", (event:any, args:any) => {
         console.log("loaded transactions")
         console.log(result);
 
-        mainWindow.webContents.send("transactionsLoaded", result);
+        event.returnValue = result;
       }, (error) => {
         console.log("Failed to load transactions: ");
         console.log(error);
       });
+  }
+});
+
+ipcMain.on("loadInOutSummary", (event: any, args: any) => {
+  if (dao) {
+    dao.loadTransactionInOutSummary(args)
+      .then(result => {
+        event.returnValue = result;
+      }, (error) => {
+        console.log("Failed to load in out summary: ");
+        console.log(error);
+      })
   }
 });
 

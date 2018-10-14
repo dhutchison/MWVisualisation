@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TransactionsService } from '../transactions.service'
-import { Transaction } from '../shared/transaction.model';
+import { Transaction } from '../../data/data-access.model';
 import { AccountsService } from '../../accounts/accounts.service';
 import { Subscription } from 'rxjs';
 

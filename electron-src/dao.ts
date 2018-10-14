@@ -26,20 +26,7 @@ export class MoneyWellDAO {
         accounts: {id: number, name: string}[]
       }): Promise<{id: number, date: Date, payee: String}[]> {
 
-        let queryParams: any[] = [];
-
-        params.accounts.forEach(value => {
-          queryParams.push(value.id);
-        });
-
-        if (params.dateRange) {
-          if (params.dateRange.start) {
-            queryParams.push(params.dateRange.start);
-          }
-          if (params.dateRange.end) {
-            queryParams.push(params.dateRange.end);
-          }
-        }
+        let queryParams: any[] = this.getParamArray(params);
 
         let query: string = 
           'SELECT Z_PK as id, ZDATEYMD as date, ZAMOUNT, ZPAYEE as payee ' + 
@@ -55,8 +42,95 @@ export class MoneyWellDAO {
         return this.all(query, queryParams);
     }
 
+    loadTransactionInOutSummary(
+        params: {
+          dateRange: {start: Date, end: Date}, 
+          accounts: {id: number, name: string}[]
+        }
+      ): Promise<{id: number, moneyIn: number, moneyOut: number}[]> {
+
+        let queryParams: any[] = this.getParamArray(params);
+
+        let query = 
+          'SELECT ZACCOUNT2 as id, ' +  
+          'SUM(case when ZAMOUNT > 0 then ZAMOUNT else 0 end) moneyIn, ' + 
+          'SUM(case when ZAMOUNT < 0 then (ZAMOUNT * -1) else 0 end) moneyOut ' + 
+          'FROM ZACTIVITY '
+          'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
+          (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
+          (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
+          'GROUP BY ZACCOUNT2';
+
+        console.log(query);
+        console.log(queryParams);
+
+        return this.all(query, queryParams);
+    }
+
+    loadBucketInOutSummary(
+      params: {
+        dateRange: {start: Date, end: Date}, 
+        accounts: {id: number, name: string}[]
+      }
+    ): Promise<{id: number, moneyIn: number, moneyOut: number}[]> {
+
+      let queryParams: any[] = this.getParamArray(params);
+
+      let query = 
+        'SELECT ZBUCKET2 as id, ' +  
+        'SUM(case when ZAMOUNT > 0 then ZAMOUNT else 0 end) moneyIn, ' + 
+        'SUM(case when ZAMOUNT < 0 then (ZAMOUNT * -1) else 0 end) moneyOut ' + 
+        'FROM ZACTIVITY '
+        'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
+        (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
+        (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
+        'GROUP BY ZBUCKET2';
+
+      console.log(query);
+      console.log(queryParams);
+
+      return this.all(query, queryParams);
+  }
+
     loadAccounts(): Promise<{id: number, name: string}[]> {
-      return this.all("SELECT Z_PK as id, ZNAME as name FROM ZACCOUNT");
+      return this.all(
+        'SELECT Z_PK as id, ZNAME as name '+ 
+        'FROM ZACCOUNT'
+      );
+    }
+
+    loadBuckets(): Promise<{id: number, name: string}[]> {
+      return this.all(
+        'SELECT Z_PK AS id, ZNAME AS name ' + 
+        'FROM ZBUCKET ' + 
+        'ORDER BY ZNAME COLLATE NOCASE'
+      );
+    }
+
+    private getParamArray(
+        params: {
+          dateRange: {start: Date, end: Date}, 
+          accounts: {id: number, name: string}[]
+        }
+      ): any[] {
+
+        let queryParams: any[] = [];
+
+        params.accounts.forEach(value => {
+          queryParams.push(value.id);
+        });
+
+        if (params.dateRange) {
+          if (params.dateRange.start) {
+            queryParams.push(params.dateRange.start);
+          }
+          if (params.dateRange.end) {
+            queryParams.push(params.dateRange.end);
+          }
+        }
+
+        return queryParams;
+
     }
 
     private get(sql: string, params: any[] = []): Promise<any[]> {
