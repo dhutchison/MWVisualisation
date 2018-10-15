@@ -2,7 +2,11 @@ import { Injectable, NgZone } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
 import { BehaviorSubject } from 'rxjs';
 
-import { TransactionFilter, Transaction } from './data-access.model'
+import { 
+    Account,
+    TransactionFilter, 
+    Transaction } from './data-access.model'
+import { InOutSummary } from '../reports/in-out-report/shared/in-out.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +17,7 @@ import { TransactionFilter, Transaction } from './data-access.model'
 export class DataAccessService {
 
   readonly fileOpen: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  readonly accounts = new BehaviorSubject<Account[]>([]);
 
   constructor(
     private _electronService : ElectronService,
@@ -25,14 +30,35 @@ export class DataAccessService {
           this.fileOpen.next(true)
         });
       });
+
+    this._electronService.ipcRenderer.on(
+      "accountsLoaded", (event: any, arg: any) => {
+        console.log("data access service got:")
+        console.log(event);
+        console.log(arg);
+
+        /* Need to force this in to the Angular context
+         * See sample project referenced in 
+         * https://github.com/ThorstenHans/ngx-electron/issues/2
+         */
+        this._ngZone.run(() => {
+          this.accounts.next(arg);
+        });
+
+      });
   }
 
   loadTransactions(filter: TransactionFilter): Promise<Transaction[]> {
     return new Promise<Transaction[]>((resolve, reject) => {
       let result = this._electronService.ipcRenderer.sendSync("loadTransactions", filter);
-      // this._ngZone.run(() => {
-        resolve(result);
-      // });
+      resolve(result);
+    });
+  }
+
+  loadAccountInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
+    return new Promise<InOutSummary[]>((resolve, reject) => {
+      let result = this._electronService.ipcRenderer.sendSync("loadInOutSummary", filter);
+      resolve(result);
     });
   }
 

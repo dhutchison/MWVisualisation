@@ -55,7 +55,7 @@ export class MoneyWellDAO {
           'SELECT ZACCOUNT2 as id, ' +  
           'SUM(case when ZAMOUNT > 0 then ZAMOUNT else 0 end) moneyIn, ' + 
           'SUM(case when ZAMOUNT < 0 then (ZAMOUNT * -1) else 0 end) moneyOut ' + 
-          'FROM ZACTIVITY '
+          'FROM ZACTIVITY ' + 
           'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
           (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
           (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 

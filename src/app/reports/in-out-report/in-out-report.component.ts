@@ -1,42 +1,89 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { InOutSummary } from './shared/in-out.model';
-import * as CanvasJS from '../../../assets/canvasjs.min';
+
+import { Chart } from 'chart.js';
+
+import { TransactionsService } from '../../transactions/transactions.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-in-out-report',
   templateUrl: './in-out-report.component.html',
   styleUrls: ['./in-out-report.component.css']
 })
-export class InOutReportComponent implements OnInit {
+export class InOutReportComponent implements OnInit, OnDestroy {
 
   private _data: InOutSummary[] = [];
+  private inOutSubscription: Subscription;
 
-  constructor() { }
+  @ViewChild('myChart') myChartRef: ElementRef;
+  chartObj: Chart;
+
+  constructor(
+    private _transactionService: TransactionsService
+  ) { }
 
   ngOnInit() {
-    let chart = new CanvasJS.Chart("chartContainer", {
-      animationEnabled: true,
-      exportEnabled: true,
-      title: {
-        text: "Basic Column Chart in Angular"
-      },
-      data: [{
-        type: "column",
-        dataPoints: [
-          { y: 71, label: "Apple" },
-          { y: 55, label: "Mango" },
-          { y: 50, label: "Orange" },
-          { y: 65, label: "Banana" },
-          { y: 95, label: "Pineapple" },
-          { y: 68, label: "Pears" },
-          { y: 28, label: "Grapes" },
-          { y: 34, label: "Lychee" },
-          { y: 14, label: "Jackfruit" }
-        ]
-      }]
+
+    this.inOutSubscription = this._transactionService.inOutSummary.subscribe(
+      (value: InOutSummary[]) => {
+        this._data = value;
+
+        this.createChart();
     });
-      
-    chart.render();
+  }
+
+  createChart(): void {
+
+    let labels: string[] = [];
+    let inDataPoints: number[] = [];
+    let outDataPoints: number[] = [];
+
+    this._data.forEach((value) => {
+      labels.push(value.id.toString());
+      inDataPoints.push(value.moneyIn);
+      outDataPoints.push(value.moneyOut);
+    });
+
+    if (this.chartObj !== undefined) {
+      this.chartObj.destroy();
+    }
+
+    this.chartObj = new Chart((<HTMLCanvasElement>this.myChartRef.nativeElement), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'In',
+            data: inDataPoints,
+            backgroundColor: 'green',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'Out',
+            data: outDataPoints,
+            backgroundColor: 'red',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.inOutSubscription.unsubscribe;
   }
 
 }

@@ -7,6 +7,7 @@ import { TransactionsService } from '../transactions.service';
   templateUrl: './transaction-filter.component.html',
   styleUrls: ['./transaction-filter.component.css']
 })
+//TODO: This component should be a form
 export class TransactionFilterComponent implements OnInit {
 
   range: Range = { fromDate: this.backDate(30), toDate: new Date() };
@@ -26,7 +27,7 @@ export class TransactionFilterComponent implements OnInit {
     this.options = {
       presets: this.presets,
       format: 'mediumDate',
-      range: {fromDate:today, toDate: today},
+      range: {fromDate:this.backDate(30), toDate: today},
       applyLabel: "Submit",
       calendarOverlayConfig: {
         // With these false we end up being able to open loads

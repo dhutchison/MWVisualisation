@@ -15,15 +15,16 @@ import {
   } from '@angular/material';
 
 import { AppComponent } from './app.component';
-import { TransactionListComponent } from './transactions/transaction-list/transaction-list.component';
+import { AppRoutingModule } from './app-routing.module';
 import { AccountListComponent } from './accounts/account-list/account-list.component';
 import { AccountsService } from './accounts/accounts.service';
-import { TransactionsService } from './transactions/transactions.service';
-import { TransactionFilterComponent } from './transactions/transaction-filter/transaction-filter.component';
-import { AppRoutingModule } from './app-routing.module';
-import { SplashComponent } from './splash/splash.component';
 import { ReportsComponent } from './reports/reports.component';
 import { InOutReportComponent } from './reports/in-out-report/in-out-report.component';
+import { TransactionListComponent } from './reports/transaction-list/transaction-list.component';
+import { SplashComponent } from './splash/splash.component';
+import { TransactionsService } from './transactions/transactions.service';
+import { TransactionFilterComponent } from './transactions/transaction-filter/transaction-filter.component';
+import { BucketSummaryComponent } from './reports/bucket-summary/bucket-summary.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { InOutReportComponent } from './reports/in-out-report/in-out-report.comp
     TransactionFilterComponent,
     SplashComponent,
     ReportsComponent,
-    InOutReportComponent
+    InOutReportComponent,
+    BucketSummaryComponent
   ],
   imports: [
     BrowserModule,

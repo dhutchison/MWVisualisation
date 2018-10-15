@@ -24,9 +24,7 @@ export class TransactionsService {
 
   constructor(
     private _accountsService: AccountsService,
-    private _dataAccessService: DataAccessService,
-    private _electronService: ElectronService,
-    private _ngZone: NgZone) { 
+    private _dataAccessService: DataAccessService) { 
     
     /* Subscribe to changes in the accounts selected */
     this._accountsService.selectedAccountsSubject.subscribe((value) => {
@@ -70,6 +68,11 @@ export class TransactionsService {
     this._dataAccessService.loadTransactions(this._filter)
       .then((result) => {
         this.transactions.next(result);
+      });
+
+    this._dataAccessService.loadAccountInOutSummary(this._filter)
+      .then((result) => {
+        this.inOutSummary.next(result);
       });
   }
 }
