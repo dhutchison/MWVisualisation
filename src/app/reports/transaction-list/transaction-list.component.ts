@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 })
 export class TransactionListComponent implements OnInit, OnDestroy {
 
+  readonly displayedColumns: string[] = ['date', 'payee', 'amount'];
   transactions: Transaction[];
 
   private _transactionsSubscription: Subscription;

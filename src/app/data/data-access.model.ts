@@ -16,5 +16,6 @@ export class TransactionFilter {
 export class Transaction {
     id: number;
     date: Date;
+    amount: number;
     payee: String;
 }

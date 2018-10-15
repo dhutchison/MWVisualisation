@@ -24,12 +24,13 @@ export class MoneyWellDAO {
       params: {
         dateRange: {start: Date, end: Date}, 
         accounts: {id: number, name: string}[]
-      }): Promise<{id: number, date: Date, payee: String}[]> {
+      }): Promise<{id: number, date: Date, amount: number, payee: String}[]> {
 
         let queryParams: any[] = this.getParamArray(params);
 
         let query: string = 
-          'SELECT Z_PK as id, ZDATEYMD as date, ZAMOUNT, ZPAYEE as payee ' + 
+          'SELECT Z_PK as id, ZDATEYMD as date, ZAMOUNT, ZPAYEE as payee, ' + 
+          'ZAMOUNT as amount ' + 
           'FROM ZACTIVITY ' + 
           'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
           (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
