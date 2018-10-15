@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { InOutSummary } from './shared/in-out.model';
+import { InOutSummary } from '../shared/in-out.model';
 
 import { Chart } from 'chart.js';
 
@@ -16,7 +16,7 @@ export class InOutReportComponent implements OnInit, OnDestroy {
   private _data: InOutSummary[] = [];
   private inOutSubscription: Subscription;
 
-  @ViewChild('myChart') myChartRef: ElementRef;
+  @ViewChild('inOutChart') myChartRef: ElementRef;
   chartObj: Chart;
 
   constructor(
@@ -25,7 +25,7 @@ export class InOutReportComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.inOutSubscription = this._transactionService.inOutSummary.subscribe(
+    this.inOutSubscription = this._transactionService.accountInOutSummary.subscribe(
       (value: InOutSummary[]) => {
         this._data = value;
 
@@ -40,7 +40,7 @@ export class InOutReportComponent implements OnInit, OnDestroy {
     let outDataPoints: number[] = [];
 
     this._data.forEach((value) => {
-      labels.push(value.id.toString());
+      labels.push(value.name);
       inDataPoints.push(value.moneyIn);
       outDataPoints.push(value.moneyOut);
     });

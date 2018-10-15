@@ -6,7 +6,8 @@ import {
     Account,
     TransactionFilter, 
     Transaction } from './data-access.model'
-import { InOutSummary } from '../reports/in-out-report/shared/in-out.model';
+import { InOutSummary } from '../reports/shared/in-out.model';
+import { resolve } from 'dns';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +58,14 @@ export class DataAccessService {
 
   loadAccountInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
     return new Promise<InOutSummary[]>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync("loadInOutSummary", filter);
+      let result = this._electronService.ipcRenderer.sendSync("loadAccountInOutSummary", filter);
+      resolve(result);
+    });
+  }
+
+  loadBucketInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
+    return new Promise<InOutSummary[]>((resolve, reject) => {
+      let result = this._electronService.ipcRenderer.sendSync("loadBucketInOutSummary", filter);
       resolve(result);
     });
   }

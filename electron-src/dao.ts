@@ -42,24 +42,25 @@ export class MoneyWellDAO {
         return this.all(query, queryParams);
     }
 
-    loadTransactionInOutSummary(
+    loadAccountInOutSummary(
         params: {
           dateRange: {start: Date, end: Date}, 
           accounts: {id: number, name: string}[]
         }
-      ): Promise<{id: number, moneyIn: number, moneyOut: number}[]> {
+      ): Promise<{id: number, name: string, moneyIn: number, moneyOut: number}[]> {
 
         let queryParams: any[] = this.getParamArray(params);
 
         let query = 
-          'SELECT ZACCOUNT2 as id, ' +  
-          'SUM(case when ZAMOUNT > 0 then ZAMOUNT else 0 end) moneyIn, ' + 
-          'SUM(case when ZAMOUNT < 0 then (ZAMOUNT * -1) else 0 end) moneyOut ' + 
-          'FROM ZACTIVITY ' + 
-          'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
-          (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
-          (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
-          'GROUP BY ZACCOUNT2';
+          'SELECT t.ZACCOUNT2 as id, a.ZNAME as name, ' +  
+          'SUM(case when t.ZAMOUNT > 0 then t.ZAMOUNT else 0 end) moneyIn, ' + 
+          'SUM(case when t.ZAMOUNT < 0 then (t.ZAMOUNT * -1) else 0 end) moneyOut ' + 
+          'FROM ZACTIVITY t ' + 
+          'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK ' + 
+          'WHERE t.ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
+          (params.dateRange && params.dateRange.start ? ' AND t.ZDATEYMD >= ? ' : '') + 
+          (params.dateRange && params.dateRange.end ? ' AND t.ZDATEYMD <= ? ' : '') + 
+          'GROUP BY t.ZACCOUNT2';
 
         console.log(query);
         console.log(queryParams);
@@ -72,19 +73,20 @@ export class MoneyWellDAO {
         dateRange: {start: Date, end: Date}, 
         accounts: {id: number, name: string}[]
       }
-    ): Promise<{id: number, moneyIn: number, moneyOut: number}[]> {
+    ): Promise<{id: number, name: string, moneyIn: number, moneyOut: number}[]> {
 
       let queryParams: any[] = this.getParamArray(params);
 
       let query = 
-        'SELECT ZBUCKET2 as id, ' +  
-        'SUM(case when ZAMOUNT > 0 then ZAMOUNT else 0 end) moneyIn, ' + 
-        'SUM(case when ZAMOUNT < 0 then (ZAMOUNT * -1) else 0 end) moneyOut ' + 
-        'FROM ZACTIVITY '
-        'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
-        (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
-        (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
-        'GROUP BY ZBUCKET2';
+        'SELECT t.ZBUCKET2 as id, b.ZNAME as name, ' +  
+        'SUM(case when t.ZAMOUNT > 0 then t.ZAMOUNT else 0 end) moneyIn, ' + 
+        'SUM(case when t.ZAMOUNT < 0 then (t.ZAMOUNT * -1) else 0 end) moneyOut ' + 
+        'FROM ZACTIVITY t ' + 
+        'INNER JOIN ZBUCKET b ON t.ZBUCKET2 = b.Z_PK ' + 
+        'WHERE t.ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
+        (params.dateRange && params.dateRange.start ? ' AND t.ZDATEYMD >= ? ' : '') + 
+        (params.dateRange && params.dateRange.end ? ' AND t.ZDATEYMD <= ? ' : '') + 
+        'GROUP BY t.ZBUCKET2';
 
       console.log(query);
       console.log(queryParams);

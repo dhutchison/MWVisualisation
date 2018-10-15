@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { ElectronService } from 'ngx-electron';
 import { AccountsService } from '../accounts/accounts.service';
-import { InOutSummary } from '../reports/in-out-report/shared/in-out.model';
+import { InOutSummary } from '../reports/shared/in-out.model';
 import { DataAccessService } from '../data/data-access.service';
 
 @Injectable({
@@ -14,7 +14,8 @@ import { DataAccessService } from '../data/data-access.service';
 export class TransactionsService {
 
   readonly transactions = new BehaviorSubject<Transaction[]>([]);
-  readonly inOutSummary = new BehaviorSubject<InOutSummary[]>([]);
+  readonly accountInOutSummary = new BehaviorSubject<InOutSummary[]>([]);
+  readonly bucketInOutSummary = new BehaviorSubject<InOutSummary[]>([]);
 
   /* Date ranges are yyyyMMdd strings */
   private _filter: {
@@ -57,9 +58,9 @@ export class TransactionsService {
   }
 
   /**
-   * Asyncronously reloads the transactions. 
+   * Reload the transaction data via the data access service
    * 
-   * Result will come in through an event from the electron service.
+   * TODO: Refactor to split work
    */
   private reloadTransactions(): void {
 
@@ -72,7 +73,12 @@ export class TransactionsService {
 
     this._dataAccessService.loadAccountInOutSummary(this._filter)
       .then((result) => {
-        this.inOutSummary.next(result);
+        this.accountInOutSummary.next(result);
+      });
+
+    this._dataAccessService.loadBucketInOutSummary(this._filter)
+      .then((result) => {
+        this.bucketInOutSummary.next(result);
       });
   }
 }

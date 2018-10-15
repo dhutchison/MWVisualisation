@@ -129,13 +129,25 @@ ipcMain.on("loadTransactions", (event:any, args:any) => {
   }
 });
 
-ipcMain.on("loadInOutSummary", (event: any, args: any) => {
+ipcMain.on("loadAccountInOutSummary", (event: any, args: any) => {
   if (dao) {
-    dao.loadTransactionInOutSummary(args)
+    dao.loadAccountInOutSummary(args)
       .then(result => {
         event.returnValue = result;
       }, (error) => {
-        console.log("Failed to load in out summary: ");
+        console.log("Failed to load account in/out summary: ");
+        console.log(error);
+      })
+  }
+});
+
+ipcMain.on("loadBucketInOutSummary", (event: any, args: any) => {
+  if (dao) {
+    dao.loadBucketInOutSummary(args)
+      .then(result => {
+        event.returnValue = result;
+      }, (error) => {
+        console.log("Failed to load bucket in/out summary: ");
         console.log(error);
       })
   }
