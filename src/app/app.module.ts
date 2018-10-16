@@ -10,6 +10,7 @@ import { NgxMatDrpModule } from 'ngx-mat-daterange-picker';
 import { 
     MatListModule,
     MatGridListModule,
+    MatSortModule,
     MatTableModule,
     MatTabsModule,
     MatToolbarModule
@@ -50,6 +51,7 @@ import { BucketSummaryComponent } from './reports/bucket-summary/bucket-summary.
     /* Angular Material Components */
     MatListModule,
     MatGridListModule,
+    MatSortModule,
     MatTableModule,
     MatTabsModule,
     MatToolbarModule,
