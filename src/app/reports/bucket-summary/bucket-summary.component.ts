@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { InOutSummary } from '../shared/in-out.model';
 import { TransactionsService } from '../../transactions/transactions.service';
 
+import * as pallete from 'google-palette';
+
 @Component({
   selector: 'app-bucket-summary',
   templateUrl: './bucket-summary.component.html',
@@ -54,16 +56,7 @@ export class BucketSummaryComponent implements OnInit, OnDestroy {
       this.inChartObj.destroy();
     }
 
-    this.inChartObj = new Chart(this.inChartRef.nativeElement, {
-      data: {
-          datasets: [{
-              data: dataPoints
-          }],
-          labels: labels
-      },
-      type: 'polarArea',
-      options: {}
-    });
+    this.inChartObj = this.createChart(labels, dataPoints, this.inChartRef);
   }
 
   private createExpenseChart() {
@@ -81,16 +74,36 @@ export class BucketSummaryComponent implements OnInit, OnDestroy {
       this.outChartObj.destroy();
     }
 
-    this.outChartObj = new Chart(this.outChartRef.nativeElement, {
+    this.outChartObj = this.createChart(labels, dataPoints, this.outChartRef);
+  }
+
+  private createChart(labels: string[], dataPoints: number[], element: ElementRef): Chart {
+
+    /* Need to stick to one of the following to not hit colour limits.
+     * If the limit is hit, null is returned from the pallete function.
+     * mpn65
+     * tol-dv (colourblind friendly)
+     * tol-sq (colourblind friendly)
+     * tol-rainbow (colourblind friendly)
+     */
+    let colours = pallete('tol-rainbow', dataPoints.length)
+      .map((hex) => {
+        return '#' + hex;
+      });
+
+    let chart = new Chart(element.nativeElement, {
       data: {
-          datasets: [{
-              data: dataPoints
-          }],
-          labels: labels
+        datasets: [{
+          data: dataPoints,
+          backgroundColor: colours
+        }],
+        labels: labels
       },
-      type: 'polarArea',
+      type: 'pie',
       options: {}
     });
+
+    return chart;
   }
 
 }
