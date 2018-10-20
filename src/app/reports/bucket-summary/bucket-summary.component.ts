@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/co
 import { Chart } from 'chart.js';
 import { Subscription } from 'rxjs';
 
-import { InOutSummary } from '../shared/in-out.model';
+import { InOutSummary } from '../../data/data-access.model';
 import { TransactionsService } from '../../transactions/transactions.service';
 
 import * as pallete from 'google-palette';

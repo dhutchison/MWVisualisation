@@ -1,11 +1,9 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Transaction } from '../data/data-access.model';
+import { InOutSummary, Transaction, TransactionFilter } from '../data/data-access.model';
 
 import { BehaviorSubject } from 'rxjs';
 
-import { ElectronService } from 'ngx-electron';
 import { AccountsService } from '../accounts/accounts.service';
-import { InOutSummary } from '../reports/shared/in-out.model';
 import { DataAccessService } from '../data/data-access.service';
 
 @Injectable({
@@ -18,10 +16,7 @@ export class TransactionsService {
   readonly bucketInOutSummary = new BehaviorSubject<InOutSummary[]>([]);
 
   /* Date ranges are yyyyMMdd strings */
-  private _filter: {
-      dateRange?: { start: string, end: string },
-      accounts?: { id: number, name: string }[]
-    } = {}
+  private _filter: TransactionFilter = {}
 
   constructor(
     private _accountsService: AccountsService,

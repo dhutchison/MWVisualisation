@@ -1,4 +1,48 @@
 import { Database } from 'sqlite3';
+import { Account, Bucket, Transaction, TransactionFilter, InOutSummary } from './model';
+
+/* Notes:
+ZSTATUS in ZACTIVITY is the transaction status.
+- 0 = Voided
+- 1 = Reconsiled
+- 2 = Cleared
+- 3 = Open
+- 4 = Pending
+
+ZTYPE in ZACTIVITY is the transaction type.
+- 0 = Deposit
+- 1 = Withdrawal
+- 2 = Check (associated Reference field is ZCHECKREF)
+
+
+Attempt at getting a total:
+select a.Z_PK as id, a.ZNAME as name,
+TOTAL(ZAMOUNT) as balance
+from ZACCOUNT a
+INNER JOIN ZACTIVITY t ON a.Z_PK = t.ZACCOUNT2
+WHERE a.ZINCLUDEINNETWORTH=1
+AND ZSTATUS > 0
+AND a.Z_PK = 1
+and zdateymd >= '20090501'
+and zdateymd < '20090503'
+GROUP BY a.Z_PK
+
+This does not compute correctly, due to a split transaction. Individual parts of the split are 
+included in the above, so are double counted (parent and children).
+Field ZSPLITPARENT contains the ID of the parent transaction (so exlude non-null values for totals)
+
+Final query for accounts and balances is:
+select a.Z_PK as id, a.ZNAME as name,
+ROUND(TOTAL(ZAMOUNT), 2) as balance
+from ZACCOUNT a
+INNER JOIN ZACTIVITY t ON a.Z_PK = t.ZACCOUNT2
+WHERE a.ZINCLUDEINNETWORTH=1
+-- Exclude voided
+AND ZSTATUS > 0
+AND ZSPLITPARENT IS NULL
+--and zdateymd < '20090504'
+GROUP BY a.Z_PK
+*/
 
 export class MoneyWellDAO {
 
@@ -21,10 +65,8 @@ export class MoneyWellDAO {
     }
 
     loadTransactions(
-      params: {
-        dateRange: {start: Date, end: Date}, 
-        accounts: {id: number, name: string}[]
-      }): Promise<{id: number, date: Date, amount: number, payee: String}[]> {
+      params: TransactionFilter
+    ): Promise<Transaction[]> {
 
         let queryParams: any[] = this.getParamArray(params);
 
@@ -44,11 +86,8 @@ export class MoneyWellDAO {
     }
 
     loadAccountInOutSummary(
-        params: {
-          dateRange: {start: Date, end: Date}, 
-          accounts: {id: number, name: string}[]
-        }
-      ): Promise<{id: number, name: string, moneyIn: number, moneyOut: number}[]> {
+        params: TransactionFilter
+      ): Promise<InOutSummary[]> {
 
         let queryParams: any[] = this.getParamArray(params);
 
@@ -61,6 +100,7 @@ export class MoneyWellDAO {
           'WHERE t.ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
           (params.dateRange && params.dateRange.start ? ' AND t.ZDATEYMD >= ? ' : '') + 
           (params.dateRange && params.dateRange.end ? ' AND t.ZDATEYMD <= ? ' : '') + 
+          'AND ZSPLITPARENT IS NULL ' + 
           'GROUP BY t.ZACCOUNT2';
 
         console.log(query);
@@ -70,11 +110,8 @@ export class MoneyWellDAO {
     }
 
     loadBucketInOutSummary(
-      params: {
-        dateRange: {start: Date, end: Date}, 
-        accounts: {id: number, name: string}[]
-      }
-    ): Promise<{id: number, name: string, moneyIn: number, moneyOut: number}[]> {
+      params: TransactionFilter
+    ): Promise<InOutSummary[]> {
 
       let queryParams: any[] = this.getParamArray(params);
 
@@ -95,73 +132,119 @@ export class MoneyWellDAO {
       return this.all(query, queryParams);
   }
 
-    loadAccounts(): Promise<{id: number, name: string}[]> {
-      return this.all(
-        'SELECT Z_PK as id, ZNAME as name '+ 
-        'FROM ZACCOUNT'
-      );
+  loadAccounts(): Promise<Account[]> {
+    return this.all(
+      'SELECT Z_PK as id, ZNAME as name '+ 
+      'FROM ZACCOUNT'
+    );
+  }
+
+  loadBuckets(): Promise<Bucket[]> {
+    return this.all(
+      'SELECT Z_PK AS id, ZNAME AS name ' + 
+      'FROM ZBUCKET ' + 
+      'ORDER BY ZNAME COLLATE NOCASE'
+    );
+  }
+
+  loadAccountsWithBalance(onDate?: string): 
+    Promise<Account[]> {
+
+    let params: any[] = [];
+    if (onDate) {
+      params.push(onDate);
     }
 
-    loadBuckets(): Promise<{id: number, name: string}[]> {
-      return this.all(
-        'SELECT Z_PK AS id, ZNAME AS name ' + 
-        'FROM ZBUCKET ' + 
-        'ORDER BY ZNAME COLLATE NOCASE'
-      );
-    }
+    let query: string = 
+      'select a.Z_PK as id, a.ZNAME as name, ' + 
+      'ROUND(TOTAL(ZAMOUNT), 2) as balance ' + 
+      'FROM ZACCOUNT a ' + 
+      'INNER JOIN ZACTIVITY t ON a.Z_PK = t.ZACCOUNT2 ' + 
+      /* Exclude voided */
+      'WHERE ZSTATUS > 0 ' + 
+      'AND ZSPLITPARENT IS NULL ' + 
+      ((onDate) ? 'zdateymd < ? ' : '') + 
+      'GROUP BY a.Z_PK';
 
-    private getParamArray(
-        params: {
-          dateRange: {start: Date, end: Date}, 
-          accounts: {id: number, name: string}[]
-        }
-      ): any[] {
+    return this.all(query, params);
 
-        let queryParams: any[] = [];
+  }
 
-        params.accounts.forEach(value => {
-          queryParams.push(value.id);
-        });
+  loadDailyTransactionTotals(
+    params: TransactionFilter
+  ): Promise<{date: string, total: number}[]> {
 
-        if (params.dateRange) {
-          if (params.dateRange.start) {
-            queryParams.push(params.dateRange.start);
-          }
-          if (params.dateRange.end) {
-            queryParams.push(params.dateRange.end);
-          }
-        }
+    let queryParams: any[] = this.getParamArray(params);
 
-        return queryParams;
+      let query = 
+        'SELECT ZDATEYMD AS date, ' + 
+        'ROUND(TOTAL(ZAMOUNT), 2) AS total ' + 
+        'FROM ZACTIVITY ' +
+        'WHERE ZSTATUS > 0 ' +
+        'AND ZSPLITPARENT IS null ' +
+        'AND ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
+        (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
+        (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
+        'GROUP BY ZDATEYMD';
 
-    }
+      console.log(query);
+      console.log(queryParams);
 
-    private get(sql: string, params: any[] = []): Promise<any[]> {
-        return new Promise((resolve, reject) => {
-          this.db.get(sql, params, (err: any, result: any) => {
-            if (err) {
-              console.error('Error running sql: ' + sql)
-              console.error(err)
-              reject(err)
-            } else {
-              resolve(result)
-            }
-          })
-        })
+      return this.all(query, queryParams);
+
+  }
+
+
+
+  private getParamArray(
+    params: TransactionFilter
+  ): any[] {
+
+    let queryParams: any[] = [];
+
+    params.accounts.forEach(value => {
+      queryParams.push(value.id);
+    });
+
+    if (params.dateRange) {
+      if (params.dateRange.start) {
+        queryParams.push(params.dateRange.start);
       }
-    
-      private all(sql:string, params:any[] = []): Promise<any[]> {
-        return new Promise((resolve, reject) => {
-          this.db.all(sql, params, (err: Error, rows: any) => {
-            if (err) {
-              console.error('Error running sql: ' + sql)
-              console.error(err)
-              reject(err)
-            } else {
-              resolve(rows)
-            }
-          })
-        })
+      if (params.dateRange.end) {
+        queryParams.push(params.dateRange.end);
       }
+    }
+
+    return queryParams;
+
+  }
+
+  private get(sql: string, params: any[] = []): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      this.db.get(sql, params, (err: any, result: any) => {
+        if (err) {
+          console.error('Error running sql: ' + sql)
+          console.error(err)
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+    })
+  }
+
+  private all(sql: string, params: any[] = []): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      this.db.all(sql, params, (err: Error, rows: any) => {
+        if (err) {
+          console.error('Error running sql: ' + sql)
+          console.error(err)
+          reject(err)
+        } else {
+          resolve(rows)
+        }
+      })
+    })
+  }
 
 }

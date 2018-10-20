@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
+import { TransactionFilter, Account } from './model';
 
 let mainWindow: Electron.BrowserWindow;
 let menu: Electron.Menu;
@@ -150,6 +151,34 @@ ipcMain.on("loadBucketInOutSummary", (event: any, args: any) => {
         console.log("Failed to load bucket in/out summary: ");
         console.log(error);
       })
+  }
+});
+
+ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => {
+  if(dao) {
+    dao.loadAccountsWithBalance(args.dateRange.start)
+      .then((result: Account[]) => {
+        let accounts = result;
+
+        dao.loadDailyTransactionTotals(args)
+          .then(totals => {
+            /* Make the response object */
+
+            let response = {
+              accounts: result,
+              totals: totals
+            };
+
+            event.returnValue = response;
+          }, (error2) => {
+            console.log("Failed to load daily transaction totals: ");
+            console.log(error2);
+          })
+      }, (error) => {
+        console.log("Failed to load acounts with initial balances: ");
+        console.log(error);
+      });
+      
   }
 });
 

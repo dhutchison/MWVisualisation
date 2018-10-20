@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { InOutSummary } from '../shared/in-out.model';
+import { InOutSummary } from '../../data/data-access.model';
 
 import { Chart } from 'chart.js';
 

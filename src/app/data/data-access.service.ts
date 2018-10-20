@@ -4,10 +4,9 @@ import { BehaviorSubject } from 'rxjs';
 
 import { 
     Account,
+    InOutSummary, 
     TransactionFilter, 
     Transaction } from './data-access.model'
-import { InOutSummary } from '../reports/shared/in-out.model';
-import { resolve } from 'dns';
 
 @Injectable({
   providedIn: 'root'
