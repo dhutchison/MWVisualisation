@@ -1,19 +1,7 @@
 import { Database } from 'sqlite3';
-import { Account, Bucket, Transaction, TransactionFilter, InOutSummary } from './model';
+import { Account, Bucket, Transaction, TransactionFilter, InOutSummary, DateTotal, TransactionStatus, TransactionType } from './model';
 
 /* Notes:
-ZSTATUS in ZACTIVITY is the transaction status.
-- 0 = Voided
-- 1 = Reconsiled
-- 2 = Cleared
-- 3 = Open
-- 4 = Pending
-
-ZTYPE in ZACTIVITY is the transaction type.
-- 0 = Deposit
-- 1 = Withdrawal
-- 2 = Check (associated Reference field is ZCHECKREF)
-
 
 Attempt at getting a total:
 select a.Z_PK as id, a.ZNAME as name,
@@ -134,7 +122,7 @@ export class MoneyWellDAO {
 
   loadAccounts(): Promise<Account[]> {
     return this.all(
-      'SELECT Z_PK as id, ZNAME as name '+ 
+      'SELECT Z_PK AS id, ZNAME AS name, ZTYPE AS type '+ 
       'FROM ZACCOUNT'
     );
   }
@@ -150,20 +138,20 @@ export class MoneyWellDAO {
   loadAccountsWithBalance(onDate?: string): 
     Promise<Account[]> {
 
-    let params: any[] = [];
+    let params: any[] = [TransactionStatus.Voided];
     if (onDate) {
       params.push(onDate);
     }
 
     let query: string = 
-      'select a.Z_PK as id, a.ZNAME as name, ' + 
-      'ROUND(TOTAL(ZAMOUNT), 2) as balance ' + 
+      'SELECT a.Z_PK AS id, a.ZNAME AS name, a.ZTYPE AS type, ' + 
+      'ROUND(TOTAL(t.ZAMOUNT), 2) AS balance ' + 
       'FROM ZACCOUNT a ' + 
       'INNER JOIN ZACTIVITY t ON a.Z_PK = t.ZACCOUNT2 ' + 
       /* Exclude voided */
-      'WHERE ZSTATUS > 0 ' + 
-      'AND ZSPLITPARENT IS NULL ' + 
-      ((onDate) ? 'zdateymd < ? ' : '') + 
+      'WHERE t.ZSTATUS != ? ' + 
+      'AND t.ZSPLITPARENT IS NULL ' + 
+      ((onDate) ? 'AND t.ZDATEYMD < ? ' : '') + 
       'GROUP BY a.Z_PK';
 
     return this.all(query, params);
@@ -172,25 +160,27 @@ export class MoneyWellDAO {
 
   loadDailyTransactionTotals(
     params: TransactionFilter
-  ): Promise<{date: string, total: number}[]> {
+  ): Promise<DateTotal[]> {
 
     let queryParams: any[] = this.getParamArray(params);
+    queryParams.push(TransactionStatus.Voided);
 
-      let query = 
-        'SELECT ZDATEYMD AS date, ' + 
-        'ROUND(TOTAL(ZAMOUNT), 2) AS total ' + 
-        'FROM ZACTIVITY ' +
-        'WHERE ZSTATUS > 0 ' +
-        'AND ZSPLITPARENT IS null ' +
-        'AND ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
-        (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
-        (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
-        'GROUP BY ZDATEYMD';
+    let query = 
+      'SELECT ZDATEYMD AS date, ' + 
+      'ROUND(TOTAL(ZAMOUNT), 2) AS total ' + 
+      'FROM ZACTIVITY ' +
+      'WHERE ZSPLITPARENT IS null ' +
+      'AND ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
+      (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
+      (params.dateRange && params.dateRange.end ? ' AND ZDATEYMD <= ? ' : '') + 
+      'AND ZSTATUS != ? ' + 
+      'GROUP BY ZDATEYMD ' + 
+      'ORDER BY ZDATEYMD';
 
-      console.log(query);
-      console.log(queryParams);
+    console.log(query);
+    console.log(queryParams);
 
-      return this.all(query, queryParams);
+    return this.all(query, queryParams);
 
   }
 

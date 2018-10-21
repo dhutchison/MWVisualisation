@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { InOutSummary, Transaction, TransactionFilter } from '../data/data-access.model';
+import { InOutSummary, Transaction, TransactionFilter, DailyWorth } from '../data/data-access.model';
 
 import { BehaviorSubject } from 'rxjs';
 
@@ -14,6 +14,10 @@ export class TransactionsService {
   readonly transactions = new BehaviorSubject<Transaction[]>([]);
   readonly accountInOutSummary = new BehaviorSubject<InOutSummary[]>([]);
   readonly bucketInOutSummary = new BehaviorSubject<InOutSummary[]>([]);
+  readonly dailyWorthSummary = new BehaviorSubject<DailyWorth>({
+    initialBalance: 0,
+    dailyWorth: []
+  });
 
   /* Date ranges are yyyyMMdd strings */
   private _filter: TransactionFilter = {}
@@ -74,6 +78,11 @@ export class TransactionsService {
     this._dataAccessService.loadBucketInOutSummary(this._filter)
       .then((result) => {
         this.bucketInOutSummary.next(result);
+      });
+
+    this._dataAccessService.loadDailyTrend(this._filter)
+      .then((result) => {
+        this.dailyWorthSummary.next(result);
       });
   }
 }

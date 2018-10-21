@@ -3,7 +3,7 @@
 <div *ngIf="accounts.length > 0">
   <mat-selection-list (selectionChange)="onSelectionChanged($event)" #accountSelection>
     <mat-list-option *ngFor="let account of accounts" [value]="account">
-      {{ account.name }}
+      {{ account.name }} ({{ account.type }})
     </mat-list-option>
   </mat-selection-list>
 

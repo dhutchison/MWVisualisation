@@ -27,6 +27,7 @@ import { SplashComponent } from './splash/splash.component';
 import { TransactionsService } from './transactions/transactions.service';
 import { TransactionFilterComponent } from './transactions/transaction-filter/transaction-filter.component';
 import { BucketSummaryComponent } from './reports/bucket-summary/bucket-summary.component';
+import { NetWorthComponent } from './reports/net-worth/net-worth.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { BucketSummaryComponent } from './reports/bucket-summary/bucket-summary.
     SplashComponent,
     ReportsComponent,
     InOutReportComponent,
-    BucketSummaryComponent
+    BucketSummaryComponent,
+    NetWorthComponent
   ],
   imports: [
     BrowserModule,

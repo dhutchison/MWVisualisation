@@ -83,7 +83,7 @@ export class InOutReportComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.inOutSubscription.unsubscribe;
+    this.inOutSubscription.unsubscribe();
   }
 
 }

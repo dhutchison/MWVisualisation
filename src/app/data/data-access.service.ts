@@ -69,5 +69,12 @@ export class DataAccessService {
     });
   }
 
+  loadDailyTrend(filter: TransactionFilter): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      let result = this._electronService.ipcRenderer.sendSync("loadDailyAccountBalances", filter);
+      resolve(result);
+    });
+  }
+
 
 }

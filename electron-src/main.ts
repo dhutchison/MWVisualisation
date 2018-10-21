@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
-import { TransactionFilter, Account } from './model';
+import { TransactionFilter, Account, DailyWorth, DateTotal } from './model';
 
 let mainWindow: Electron.BrowserWindow;
 let menu: Electron.Menu;
@@ -155,19 +155,41 @@ ipcMain.on("loadBucketInOutSummary", (event: any, args: any) => {
 });
 
 ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => {
-  if(dao) {
+  if(dao && args.dateRange) {
     dao.loadAccountsWithBalance(args.dateRange.start)
       .then((result: Account[]) => {
-        let accounts = result;
+
+        
+        let filterAccountIDs: number[] = args.accounts.map(a => a.id);
 
         dao.loadDailyTransactionTotals(args)
           .then(totals => {
-            /* Make the response object */
+            /* Get the initial balance for the filter accounts */
+            let initialBalance = result
+              .filter(value => {
+                return filterAccountIDs.includes(value.id);
+              })
+              .map(a => a.balance)
+              .reduce((total, value) => total + value, 0);
 
-            let response = {
-              accounts: result,
-              totals: totals
+            /* Work out the daily worth */
+            let runningTotal = initialBalance;
+            let dailyWorth: DateTotal[] = totals
+              .map(value => {
+                runningTotal += value.total;
+                return {
+                  date: value.date,
+                  total: runningTotal
+                }
+              });
+            
+            /* Make the response object */
+            let response: DailyWorth = {
+              initialBalance: initialBalance,
+              dailyWorth: dailyWorth
             };
+
+            console.log(response);
 
             event.returnValue = response;
           }, (error2) => {
@@ -179,6 +201,12 @@ ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => 
         console.log(error);
       });
       
+  } else {
+    /* Can't load any data */
+    event.returnValue = {
+      initialBalance: 0,
+      dailyWorth: []
+    };
   }
 });
 
