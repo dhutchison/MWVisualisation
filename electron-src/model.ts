@@ -18,6 +18,13 @@ export enum AccountType {
 export class Bucket {
     id: number;
     name: string;
+    type: BucketType;
+}
+
+/* ZTYPE field in ZBUCKET is the bucket type */
+export enum BucketType {
+    Income = 1,
+    Expense = 2
 }
 
 export class DateRange {

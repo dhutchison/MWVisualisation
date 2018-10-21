@@ -104,7 +104,7 @@ export class MoneyWellDAO {
       let queryParams: any[] = this.getParamArray(params);
 
       let query = 
-        'SELECT t.ZBUCKET2 as id, b.ZNAME as name, ' +  
+        'SELECT t.ZBUCKET2 AS id, b.ZNAME AS name, b.ZTYPE AS type, ' +  
         'SUM(case when t.ZAMOUNT > 0 then t.ZAMOUNT else 0 end) moneyIn, ' + 
         'SUM(case when t.ZAMOUNT < 0 then (t.ZAMOUNT * -1) else 0 end) moneyOut ' + 
         'FROM ZACTIVITY t ' + 
@@ -129,7 +129,7 @@ export class MoneyWellDAO {
 
   loadBuckets(): Promise<Bucket[]> {
     return this.all(
-      'SELECT Z_PK AS id, ZNAME AS name ' + 
+      'SELECT Z_PK AS id, ZNAME AS name, ZTYPE AS type ' + 
       'FROM ZBUCKET ' + 
       'ORDER BY ZNAME COLLATE NOCASE'
     );
