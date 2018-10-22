@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { TransactionsService } from '../../transactions/transactions.service'
-import { Transaction } from '../../data/data-access.model';
+import { Transaction, Account } from '../../data/data-access.model';
 import { Subscription } from 'rxjs';
 
 import { MatSort, MatTableDataSource } from '@angular/material';
+import { AccountsService } from 'src/app/accounts/accounts.service';
 
 @Component({
   selector: 'app-transaction-list',
@@ -16,20 +17,31 @@ export class TransactionListComponent implements OnInit, OnDestroy {
 
   readonly displayedColumns: string[] = ['date', 'payee', 'amount'];
   transactions: Transaction[] = [];
+  
+  readonly accounts: Map<number, Account> = new Map();
 
   dataSource = new MatTableDataSource(this.transactions);
   selection = new SelectionModel<Transaction>(true, []);
 
   @ViewChild(MatSort) sort: MatSort;
 
+  private _accountsSubscription: Subscription;
   private _transactionsSubscription: Subscription;
 
   constructor(
-    private _transactionService: TransactionsService) { }
+    private _transactionService: TransactionsService,
+    private _accountsService: AccountsService) { }
 
   ngOnInit() {
     
     this.dataSource.sort = this.sort;
+
+    this._accountsSubscription = this._accountsService.selectedAccountsSubject.subscribe(
+      (accounts) => {
+        /* Could clear the existing values, but we are not too bothered if this holds more values */
+        accounts.forEach((value) => this.accounts.set(value.id, value));
+      }
+    );
 
     this._transactionsSubscription = this._transactionService.transactions.subscribe(
       (transactions) => {
@@ -40,6 +52,27 @@ export class TransactionListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._transactionsSubscription.unsubscribe();
+  }
+
+  getCurrency(transaction?: Transaction): string {
+
+    let currencyCode: string;
+    if (transaction) {
+      /* Transaction argument was supplied, get the appropriate code for the account */
+      console.log('Getting code for account ', transaction.accountId);
+      currencyCode = this.accounts.get(transaction.accountId).currencyCode;
+    } else {
+      /* No transaction applied, default to the first accout in the map */
+      console.log('Getting code for default account');
+
+      let account = this.accounts.get(this.accounts.keys().next().value);
+      if (account) {
+        /* If there are any accounts loaded */
+        currencyCode = account.currencyCode;
+      }
+    }
+
+    return currencyCode;
   }
 
   getTotal(): number {

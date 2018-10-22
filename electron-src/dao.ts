@@ -3,6 +3,14 @@ import { Account, Bucket, Transaction, TransactionFilter, InOutSummary, DateTota
 
 /* Notes:
 
+ZACTIVITY has two columns holding the currency for a transaction:
+- zsalecurrencycode
+- zsalecurrencycode1
+The latter seems to be the correct one, the former is only populated for a few 
+transactions with a null ZSTATUS
+BUT this does not appear to be a field which is in the UI. 
+Just going to use the account currency (ZCURRENCYCODE in ZACCOUNT)
+
 Attempt at getting a total:
 select a.Z_PK as id, a.ZNAME as name,
 TOTAL(ZAMOUNT) as balance
@@ -51,6 +59,26 @@ export class MoneyWellDAO {
         });
       });
     }
+    
+  disconnect(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.db) {
+        this.db.close((err: Error) => {
+          if (err) {
+            console.log('Could not close database', err);
+            reject(err);
+          } else {
+            console.log('Disconnected from database');
+            this.db = undefined;
+            resolve();
+          }
+        });
+      } else {
+        console.log("Database not open")
+        resolve();
+      }
+    });
+  }
 
     loadTransactions(
       params: TransactionFilter
@@ -59,8 +87,9 @@ export class MoneyWellDAO {
         let queryParams: any[] = this.getParamArray(params);
 
         let query: string = 
-          'SELECT Z_PK as id, ZDATEYMD as date, ZAMOUNT, ZPAYEE as payee, ' + 
-          'ZAMOUNT as amount ' + 
+          'SELECT Z_PK AS id, ZDATEYMD AS date, ZAMOUNT, ZPAYEE AS payee, ' + 
+          'ZACCOUNT2 AS accountId, ' +  
+          'ZAMOUNT AS amount, ZSTATUS AS status, ZTYPE AS type ' + 
           'FROM ZACTIVITY ' + 
           'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
           (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 
@@ -122,7 +151,7 @@ export class MoneyWellDAO {
 
   loadAccounts(): Promise<Account[]> {
     return this.all(
-      'SELECT Z_PK AS id, ZNAME AS name, ZTYPE AS type '+ 
+      'SELECT Z_PK AS id, ZNAME AS name, ZTYPE AS type, ZCURRENCYCODE AS currencyCode '+ 
       'FROM ZACCOUNT'
     );
   }
@@ -144,7 +173,7 @@ export class MoneyWellDAO {
     }
 
     let query: string = 
-      'SELECT a.Z_PK AS id, a.ZNAME AS name, a.ZTYPE AS type, ' + 
+      'SELECT a.Z_PK AS id, a.ZNAME AS name, a.ZTYPE AS type, a.ZCURRENCYCODE AS currencyCode, ' + 
       'ROUND(TOTAL(t.ZAMOUNT), 2) AS balance ' + 
       'FROM ZACCOUNT a ' + 
       'INNER JOIN ZACTIVITY t ON a.Z_PK = t.ZACCOUNT2 ' + 

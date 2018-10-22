@@ -24,10 +24,15 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
+
+    /* Close any open database connection */
+    if (dao) {
+      dao.disconnect();
+    }
   });
 }
 
-function openFile () {
+function openFile() {
 
   let options: OpenDialogOptions = {
     properties: ['openFile']
@@ -35,7 +40,7 @@ function openFile () {
 
   dialog.showOpenDialog(mainWindow, options, (filePaths: string[], bookmarks: string[]) => {
     console.log(filePaths);
-    
+
     /* Open the file */
     dao = new MoneyWellDAO(filePaths[0]);
     /* Connect to the database */
@@ -60,19 +65,19 @@ function openFile () {
         console.log(error);
       });
 
-  }); 
- 
- }
+  });
+
+}
 
 function createMenu() {
   const template: Electron.MenuItemConstructorOptions[] = [
     {
       label: 'File',
       submenu: [
-        { 
-          label: 'Open File', 
+        {
+          label: 'Open File',
           accelerator: 'CmdOrCtrl+O',
-          click () { openFile(); }
+          click() { openFile(); }
         }
       ]
     },
@@ -97,15 +102,15 @@ function createMenu() {
     template.unshift({
       label: app.getName(),
       submenu: [
-        {role: 'about'},
-        {type: 'separator'},
-        {role: 'services', submenu: []},
-        {type: 'separator'},
-        {role: 'hide'},
-        {role: 'hideothers'},
-        {role: 'unhide'},
-        {type: 'separator'},
-        {role: 'quit'}
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services', submenu: [] },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
       ]
     });
   }
@@ -114,7 +119,7 @@ function createMenu() {
   Menu.setApplicationMenu(menu);
 }
 
-ipcMain.on("loadTransactions", (event:any, args:any) => {
+ipcMain.on("loadTransactions", (event: any, args: any) => {
   if (dao) {
     /* Only process the request if the DAO has been setup */
     dao.loadTransactions(args)
@@ -155,11 +160,11 @@ ipcMain.on("loadBucketInOutSummary", (event: any, args: any) => {
 });
 
 ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => {
-  if(dao && args.dateRange) {
+  if (dao && args.dateRange) {
     dao.loadAccountsWithBalance(args.dateRange.start)
       .then((result: Account[]) => {
 
-        
+
         let filterAccountIDs: number[] = args.accounts.map(a => a.id);
 
         dao.loadDailyTransactionTotals(args)
@@ -182,7 +187,7 @@ ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => 
                   total: runningTotal
                 }
               });
-            
+
             /* Make the response object */
             let response: DailyWorth = {
               initialBalance: initialBalance,
@@ -200,7 +205,7 @@ ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => 
         console.log("Failed to load acounts with initial balances: ");
         console.log(error);
       });
-      
+
   } else {
     /* Can't load any data */
     event.returnValue = {

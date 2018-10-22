@@ -2,6 +2,7 @@
 
 export class Account {
     id: number;
+    currencyCode: string;
     name: string;
     type: AccountType;
     balance?: number
@@ -11,13 +12,23 @@ export class Account {
 export enum AccountType {
     Checking = 0,
     Savings = 1,
-    Credit = 2
-    //TODO: There are other account types
+    Credit = 2,
+    Loan = 3,
+    Investment = 4,
+    Cash = 5,
+    MoneyMarket = 6
 }
 
 export class Bucket {
     id: number;
     name: string;
+    type: BucketType;
+}
+
+/* ZTYPE field in ZBUCKET is the bucket type */
+export enum BucketType {
+    Income = 1,
+    Expense = 2
 }
 
 export class DateRange {
@@ -46,7 +57,11 @@ export class Transaction {
     id: number;
     date: Date;
     amount: number;
+    accountId: number;
     payee: string;
+    status: TransactionStatus;
+    type: TransactionType;
+
 }
 
 export class TransactionFilter {
