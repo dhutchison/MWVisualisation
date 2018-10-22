@@ -10,6 +10,7 @@ import { NgxMatDrpModule } from 'ngx-mat-daterange-picker';
 import { 
     MatListModule,
     MatGridListModule,
+    MatIconModule, 
     MatSortModule,
     MatTableModule,
     MatTabsModule,
@@ -53,6 +54,7 @@ import { NetWorthComponent } from './reports/net-worth/net-worth.component';
     /* Angular Material Components */
     MatListModule,
     MatGridListModule,
+    MatIconModule,
     MatSortModule,
     MatTableModule,
     MatTabsModule,

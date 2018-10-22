@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Output } from '@angular/core';
 import { AccountsService } from '../accounts.service';
 import { Subscription } from 'rxjs';
 import { MatSelectionListChange } from '@angular/material/list';
-import { Account } from '../../data/data-access.model';
+import { Account, AccountType } from '../../data/data-access.model';
 import { DataAccessService } from '../../data/data-access.service';
 
 @Component({
@@ -43,6 +43,21 @@ export class AccountListComponent implements OnInit, OnDestroy {
     });
 
     this._accountsService.selectedAccounts = selectedAccounts;
+  }
+
+  getIconName(account: Account) : string {
+
+    let iconName: string;
+
+    if(account.type === AccountType.Credit) {
+      iconName = 'credit_card';
+    } else if (account.type === AccountType.Checking) {
+      iconName = 'account_balance';
+    } else {
+      iconName = 'account_balance_wallet';
+    }
+
+    return iconName;
   }
 
   ngOnDestroy() {
