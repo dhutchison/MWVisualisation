@@ -53,6 +53,10 @@ export class AccountListComponent implements OnInit, OnDestroy {
       iconName = 'credit_card';
     } else if (account.type === AccountType.Checking) {
       iconName = 'account_balance';
+    } else if (account.type === AccountType.Investment || account.type === AccountType.MoneyMarket) {
+      iconName = 'trending_up';
+    } else if (account.type === AccountType.Loan) {
+      iconName = 'trending_down';
     } else {
       iconName = 'account_balance_wallet';
     }
