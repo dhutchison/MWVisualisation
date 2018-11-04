@@ -29,7 +29,10 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+    <tr mat-row 
+      *matRowDef="let row; columns: displayedColumns;" 
+      [ngClass]="{'selected': selection.isSelected(row)}"
+      (click)="selection.toggle(row)"></tr>
     <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
   </table>
 </div>

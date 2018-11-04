@@ -21,7 +21,7 @@ export class TransactionListComponent implements OnInit, OnDestroy {
   readonly accounts: Map<number, Account> = new Map();
 
   dataSource = new MatTableDataSource(this.transactions);
-  selection = new SelectionModel<Transaction>(true, []);
+  selection = new SelectionModel<Transaction>(false, [], true);
 
   @ViewChild(MatSort) sort: MatSort;
 
