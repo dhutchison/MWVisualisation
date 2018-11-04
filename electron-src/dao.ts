@@ -89,7 +89,8 @@ export class MoneyWellDAO {
         let query: string = 
           'SELECT Z_PK AS id, ZDATEYMD AS date, ZAMOUNT, ZPAYEE AS payee, ' + 
           'ZACCOUNT2 AS accountId, ' +  
-          'ZAMOUNT AS amount, ZSTATUS AS status, ZTYPE AS type ' + 
+          'ZAMOUNT AS amount, ZSTATUS AS status, ZTYPE AS type, ' +
+          'ZBUCKET2 AS bucketId, ZMEMO AS memo ' +  
           'FROM ZACTIVITY ' + 
           'WHERE ZACCOUNT2 in ( ' + params.accounts.map(() => {return '?'}).join(',')+ ')' + 
           (params.dateRange && params.dateRange.start ? ' AND ZDATEYMD >= ? ' : '') + 

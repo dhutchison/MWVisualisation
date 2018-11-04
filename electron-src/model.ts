@@ -62,6 +62,10 @@ export class Transaction {
     status: TransactionStatus;
     type: TransactionType;
 
+    bucketId: number;
+    memo: string;
+    tags: number[] = [];
+    transferToAccountId: number;
 }
 
 export class TransactionFilter {
