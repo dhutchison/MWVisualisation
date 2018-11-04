@@ -59,12 +59,9 @@ export class TransactionListComponent implements OnInit, OnDestroy {
     let currencyCode: string;
     if (transaction) {
       /* Transaction argument was supplied, get the appropriate code for the account */
-      console.log('Getting code for account ', transaction.accountId);
       currencyCode = this.accounts.get(transaction.accountId).currencyCode;
     } else {
       /* No transaction applied, default to the first accout in the map */
-      console.log('Getting code for default account');
-
       let account = this.accounts.get(this.accounts.keys().next().value);
       if (account) {
         /* If there are any accounts loaded */
