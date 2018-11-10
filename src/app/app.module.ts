@@ -14,7 +14,11 @@ import {
     MatSortModule,
     MatTableModule,
     MatTabsModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatSelectModule,
+    MatCheckboxModule
   } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -29,6 +33,8 @@ import { TransactionsService } from './transactions/transactions.service';
 import { TransactionFilterComponent } from './transactions/transaction-filter/transaction-filter.component';
 import { BucketSummaryComponent } from './reports/bucket-summary/bucket-summary.component';
 import { NetWorthComponent } from './reports/net-worth/net-worth.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { TransactionEditorComponent } from './transactions/transaction-editor/transaction-editor.component';
 
 @NgModule({
   declarations: [
@@ -40,21 +46,27 @@ import { NetWorthComponent } from './reports/net-worth/net-worth.component';
     ReportsComponent,
     InOutReportComponent,
     BucketSummaryComponent,
-    NetWorthComponent
+    NetWorthComponent,
+    TransactionEditorComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FlexLayoutModule,
     NgxElectronModule,
+    ReactiveFormsModule,
 
     /* Material date range picker component */
     NgxMatDrpModule,
 
     /* Angular Material Components */
-    MatListModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
     MatGridListModule,
     MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatSelectModule,
     MatSortModule,
     MatTableModule,
     MatTabsModule,
