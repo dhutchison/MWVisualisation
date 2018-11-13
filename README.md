@@ -1,27 +1,33 @@
 # MWVisualisation
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.4.
+MWVisualisation is a companion application for [MoneyWell](https://moneywellapp.com).
 
-## Development server
+This application can open the SQLite database used by MoneyWell and provide reporting functionality. 
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+This exists for two reasons:
+1. As a project for (re-)learning Angular
+2. To provide better metrics on my financial health than MoneyWell provides natively. 
 
-## Code scaffolding
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Originally this was intended to be an in-browser application, but in order to open files locally I had to change this to use the [Electron](https://electronjs.org) application framework. In theory, this application would work on operating systems other than MacOs, although this has never been tested. 
 
-## Build
+## Project Structure
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+This is not expected to be the final structure, but it works for now. I hit some issues with the compilation of the two sides of the application when putting everything in `src`.
 
-## Running unit tests
+### electronSrc
+This directory contains all the code for the backend of the electron application. This side interacts with the SQLite database. 
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### src
+This directory contains all the code for the Angular application front end. 
+All communication with the backend is provided through the service file "app/data/data-access.service.ts".
 
-## Running end-to-end tests
+## Running
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Run `npm run electron-tsc` to compile and run an instance of the application.
 
-## Further help
+## Packaging for Distribution
+TODO: Need to define this
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Running test suites
+TODO: Not there at all yet
