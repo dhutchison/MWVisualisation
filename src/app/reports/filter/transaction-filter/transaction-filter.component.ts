@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgxDrpOptions, PresetItem, Range } from 'ngx-mat-daterange-picker';
-import { TransactionsService } from '../transactions.service';
+import { TransactionsService } from '../../transactions.service';
 
 @Component({
   selector: 'app-transaction-filter',

@@ -1,9 +1,9 @@
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { InOutSummary } from '../../data/data-access.model';
+import { InOutSummary } from '../../data-access/data-access.model';
 
 import { Chart } from 'chart.js';
 
-import { TransactionsService } from '../../transactions/transactions.service';
+import { TransactionsService } from '../transactions.service';
 import { Subscription } from 'rxjs';
 
 @Component({

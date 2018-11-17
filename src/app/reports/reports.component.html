@@ -1,21 +1,38 @@
-<div>
-  <div fxFlex="25%">
-    <app-transaction-filter></app-transaction-filter>
-  </div>
-  <div fxFlex="75%">
-    <mat-tab-group>
-      <mat-tab label="In/Out">
-        <app-in-out-report></app-in-out-report>
-      </mat-tab>
-      <mat-tab label="Bucket Summary">
-        <app-bucket-summary></app-bucket-summary>
-      </mat-tab>
-      <mat-tab label="Transactions">
-        <app-transaction-list></app-transaction-list>
-      </mat-tab>
-      <mat-tab label="Net Worth">
-        <app-net-worth></app-net-worth>
-      </mat-tab>
-    </mat-tab-group>
-  </div>
-</div>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport="true"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="!(isHandset$ | async)">
+    <mat-toolbar color="primary">Menu</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/reports/cash-flow">Cash Flow</a>
+      <a mat-list-item routerLink="/reports/bucket-summary">Bucket Summary</a>
+      <a mat-list-item routerLink="/reports/transactions">Transactions</a>
+      <a mat-list-item routerLink="/reports/net-worth">Net Worth</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span>MW-Visualisation</span>
+    </mat-toolbar>
+    
+    <!-- Page content -->
+    <div fxFlex="25%">
+      <app-transaction-filter></app-transaction-filter>
+    </div>
+    <div fxFlex="75%">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -3,8 +3,8 @@ import { Subscription } from 'rxjs';
 
 import { Chart } from 'chart.js';
 
-import { TransactionsService } from 'src/app/transactions/transactions.service';
-import { DailyWorth } from 'src/app/data/data-access.model';
+import { TransactionsService } from 'src/app/reports/transactions.service';
+import { DailyWorth } from 'src/app/data-access/data-access.model';
 
 @Component({
   selector: 'app-net-worth',

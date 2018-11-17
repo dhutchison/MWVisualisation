@@ -1,20 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css']
 })
-/* TODO:
- * Add reports for:
- * Monthly spend variation (trends / buckets)
- * View of total money over time (area type graph, starting balance then use transactions to show day-by-day worth)
- */
-export class ReportsComponent implements OnInit {
+export class ReportsComponent {
 
-  constructor() { }
-
-  ngOnInit() {
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+    .pipe(
+      map(result => result.matches)
+    );
+    
+  constructor(private breakpointObserver: BreakpointObserver) {}
+  
   }
-
-}

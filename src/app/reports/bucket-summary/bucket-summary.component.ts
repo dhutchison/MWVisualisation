@@ -2,8 +2,8 @@ import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/co
 import { Chart } from 'chart.js';
 import { Subscription } from 'rxjs';
 
-import { InOutSummary } from '../../data/data-access.model';
-import { TransactionsService } from '../../transactions/transactions.service';
+import { InOutSummary } from '../../data-access/data-access.model';
+import { TransactionsService } from '../transactions.service';
 
 import * as pallete from 'google-palette';
 

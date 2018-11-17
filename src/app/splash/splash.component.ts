@@ -1,7 +1,6 @@
-import { Component, OnInit, NgZone } from '@angular/core';
-import { ElectronService } from 'ngx-electron';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DataAccessService } from '../data/data-access.service';
+import { DataAccessService } from '../data-access/data-access.service';
 
 @Component({
   selector: 'app-splash',

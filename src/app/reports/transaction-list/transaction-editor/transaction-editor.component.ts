@@ -3,8 +3,8 @@ import { FormGroup, FormControl } from '@angular/forms';
 
 import { Subscription } from 'rxjs'
 
-import { Account, TransactionStatus, TransactionType, Transaction } from 'src/app/data/data-access.model';
-import { DataAccessService } from 'src/app/data/data-access.service';
+import { Account, TransactionStatus, TransactionType, Transaction } from 'src/app/data-access/data-access.model';
+import { DataAccessService } from 'src/app/data-access/data-access.service';
 
 @Component({
   selector: 'app-transaction-editor',

@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, Output } from '@angular/core';
 import { AccountsService } from '../accounts.service';
 import { Subscription } from 'rxjs';
 import { MatSelectionListChange } from '@angular/material/list';
-import { Account, AccountType } from '../../data/data-access.model';
-import { DataAccessService } from '../../data/data-access.service';
+import { Account, AccountType } from '../../../../data-access/data-access.model';
+import { DataAccessService } from '../../../../data-access/data-access.service';
 
 @Component({
   selector: 'app-account-list',

@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-import { Account } from '../data/data-access.model';
+import { Account } from '../../../data-access/data-access.model';
 
 @Injectable({
   providedIn: 'root'

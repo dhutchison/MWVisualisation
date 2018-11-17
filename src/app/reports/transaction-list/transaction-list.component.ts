@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { TransactionsService } from '../../transactions/transactions.service'
-import { Transaction, Account } from '../../data/data-access.model';
+import { TransactionsService } from '../transactions.service'
+import { Transaction, Account } from '../../data-access/data-access.model';
 import { Subscription } from 'rxjs';
 
 import { MatSort, MatTableDataSource } from '@angular/material';
-import { AccountsService } from 'src/app/accounts/accounts.service';
+import { AccountsService } from '../filter/accounts/accounts.service';
 
 @Component({
   selector: 'app-transaction-list',

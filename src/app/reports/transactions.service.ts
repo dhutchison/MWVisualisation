@@ -1,10 +1,10 @@
-import { Injectable, NgZone } from '@angular/core';
-import { InOutSummary, Transaction, TransactionFilter, DailyWorth } from '../data/data-access.model';
+import { Injectable } from '@angular/core';
+import { InOutSummary, Transaction, TransactionFilter, DailyWorth } from '../data-access/data-access.model';
 
 import { BehaviorSubject } from 'rxjs';
 
-import { AccountsService } from '../accounts/accounts.service';
-import { DataAccessService } from '../data/data-access.service';
+import { AccountsService } from './filter/accounts/accounts.service';
+import { DataAccessService } from '../data-access/data-access.service';
 
 @Injectable({
   providedIn: 'root'
