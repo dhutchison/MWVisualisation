@@ -12,6 +12,7 @@
       <a mat-list-item routerLink="/reports/bucket-summary">Bucket Summary</a>
       <a mat-list-item routerLink="/reports/transactions">Transactions</a>
       <a mat-list-item routerLink="/reports/net-worth">Net Worth</a>
+      <a mat-list-item routerLink="/reports/income-trend">Income Trend</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -28,10 +29,7 @@
     </mat-toolbar>
     
     <!-- Page content -->
-    <div fxFlex="25%">
-      <app-transaction-filter></app-transaction-filter>
-    </div>
-    <div fxFlex="75%">
+    <div>
       <router-outlet></router-outlet>
     </div>
   </mat-sidenav-content>

@@ -29,13 +29,15 @@ import { TransactionEditorComponent } from './transaction-list/transaction-edito
 import { AccountsService } from './filter/accounts/accounts.service';
 import { TransactionsService } from './transactions.service';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IncomeTrendComponent } from './income-trend/income-trend.component';
 
 const routes: Routes = [
   { path: '', component: ReportsComponent, children: [
     { path: 'cash-flow', component: InOutReportComponent },
     { path: 'bucket-summary', component: BucketSummaryComponent },
     { path: 'transactions', component: TransactionListComponent },
-    { path: 'net-worth', component : NetWorthComponent }
+    { path: 'net-worth', component : NetWorthComponent },
+    { path: 'income-trend', component: IncomeTrendComponent }
   ]}
 ]
 
@@ -77,6 +79,7 @@ const routes: Routes = [
     TransactionEditorComponent,
     TransactionFilterComponent,
     TransactionListComponent,
+    IncomeTrendComponent,
   ], 
   providers: [
     AccountsService, 
