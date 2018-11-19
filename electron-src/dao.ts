@@ -1,5 +1,5 @@
-import { Database } from 'sqlite3';
-import { Account, Bucket, Transaction, TransactionFilter, InOutSummary, DateTotal, TransactionStatus, TransactionType } from './model';
+import { Database, Statement } from 'sqlite3';
+import { Account, Bucket, Transaction, TransactionFilter, InOutSummary, DateTotal, TransactionStatus, TransactionType, TimePeriod, TrendData } from './model';
 
 /* Notes:
 
@@ -101,6 +101,79 @@ export class MoneyWellDAO {
         console.log(queryParams);
 
         return this.all(query, queryParams);
+    }
+
+    loadIncomeTrend(timePeriod: TimePeriod) : Promise<TrendData[]> {
+
+      let queryParams: any[] = [TransactionStatus.Voided];
+      //TODO: Parameter
+      queryParams.push('20170101');
+
+      // TODO: Implement time period support
+      let dateQueryPart: string;
+      switch (timePeriod) {
+        //TODO: Week support
+        case TimePeriod.DAY:
+          dateQueryPart = 't.ZDATEYMD'
+          break;
+        case TimePeriod.MONTH:
+          dateQueryPart = 'substr(t.ZDATEYMD, 0, length(t.ZDATEYMD) -1)';
+          break;
+        case TimePeriod.YEAR:
+          dateQueryPart = 'substr(t.ZDATEYMD, 0, length(t.ZDATEYMD) -3)';
+          break;
+      }
+
+      let query = 
+        'SELECT b.Z_PK AS bucketId, b.ZNAME AS bucketName, ' +
+        dateQueryPart + ' AS date, ' +
+        'ROUND(TOTAL(t.ZAMOUNT), 2) AS total ' +
+        'FROM ZBUCKET b ' +
+        'INNER JOIN ZACTIVITY t ON b.Z_PK = t.ZBUCKET2 ' +
+        'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK ' +
+        'WHERE b.ZTYPE = 1 ' +
+        'AND a.ZINCLUDEINCASHFLOW=1 ' +
+        'AND ZSTATUS != ?  ' +
+        'AND t.ZDATEYMD > ? ' +
+        'GROUP BY b.Z_PK, ' + dateQueryPart + ' ' +
+        'ORDER BY t.ZDATEYMD';
+
+      
+      let results = new Map<number, TrendData>();
+
+      return new Promise((resolve, reject) => {
+        this.db.each(query, queryParams, 
+          (err: Error, row: any) => {
+
+            let bucketData: TrendData = results.get(row.bucketId);
+            if(bucketData === undefined) {
+              /* Not seen this bucket before, create the holder object */
+              bucketData = new TrendData();
+              bucketData.label = row.bucketName;
+              bucketData.dataPoints = [];
+
+              results.set(row.bucketId, bucketData);
+            }
+
+            let dateTotal = new DateTotal();
+            dateTotal.date = row.date;
+            dateTotal.total = row.total;
+
+            bucketData.dataPoints.push(dateTotal);
+
+          }, (err: Error, count: number) => {
+            if (err) {
+              console.error('Error running sql: ' + query)
+              console.error(err)
+              reject(err)
+            } else {
+              let resultRows: TrendData[] = [];
+              results.forEach(value => resultRows.push(value));
+
+              resolve(resultRows);
+            }
+          });
+       });
     }
 
     loadAccountInOutSummary(

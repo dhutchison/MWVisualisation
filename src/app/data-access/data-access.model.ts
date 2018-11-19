@@ -53,6 +53,13 @@ export class InOutSummary {
     moneyOut: number;
 }
 
+export enum TimePeriod {
+    DAY,
+    WEEK,
+    MONTH,
+    YEAR
+}
+
 export class Transaction {
     id: number;
     date: Date;
@@ -88,4 +95,10 @@ export enum TransactionStatus {
     Cleared = 2,
     Open = 3,
     Pending = 4
+}
+
+
+export class TrendData {
+    label: string;
+    dataPoints: DateTotal[];
 }

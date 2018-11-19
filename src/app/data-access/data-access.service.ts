@@ -6,7 +6,9 @@ import {
     Account,
     InOutSummary, 
     TransactionFilter, 
-    Transaction } from './data-access.model'
+    Transaction, 
+    TimePeriod,
+    TrendData} from './data-access.model'
 
 @Injectable({
   providedIn: 'root'
@@ -55,18 +57,29 @@ export class DataAccessService {
     });
   }
 
-  loadAccountInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
-    return new Promise<InOutSummary[]>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync("loadAccountInOutSummary", filter);
+  loadIncomeTrend(timePeriod: TimePeriod = TimePeriod.DAY) : Promise<TrendData[]> {
+    return new Promise<TrendData[]>((resolve, reject) => {
+      let result = this._electronService.ipcRenderer.sendSync("loadIncomeTrend", timePeriod);
       resolve(result);
     });
   }
 
+  loadAccountInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
+    return this.loadInOutSummary(filter, "loadAccountInOutSummary");
+  }
+
   loadBucketInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
+    return this.loadInOutSummary(filter, "loadBucketInOutSummary");
+  }
+
+  private loadInOutSummary(filter: TransactionFilter, dataLoadCommand: string): 
+    Promise<InOutSummary[]> {
+
     return new Promise<InOutSummary[]>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync("loadBucketInOutSummary", filter);
+      let result = this._electronService.ipcRenderer.sendSync(dataLoadCommand, filter);
       resolve(result);
-    });
+    });  
+
   }
 
   loadDailyTrend(filter: TransactionFilter): Promise<any> {

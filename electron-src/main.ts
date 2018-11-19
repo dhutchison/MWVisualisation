@@ -1,7 +1,7 @@
-import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions } from 'electron';
+import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions, Event } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
-import { TransactionFilter, Account, DailyWorth, DateTotal } from './model';
+import { TransactionFilter, Account, NetWorth, DateTotal, TimePeriod } from './model';
 
 let mainWindow: Electron.BrowserWindow;
 let menu: Electron.Menu;
@@ -119,7 +119,7 @@ function createMenu() {
   Menu.setApplicationMenu(menu);
 }
 
-ipcMain.on("loadTransactions", (event: any, args: any) => {
+ipcMain.on("loadTransactions", (event: Event, args: any) => {
   if (dao) {
     /* Only process the request if the DAO has been setup */
     dao.loadTransactions(args)
@@ -135,7 +135,23 @@ ipcMain.on("loadTransactions", (event: any, args: any) => {
   }
 });
 
-ipcMain.on("loadAccountInOutSummary", (event: any, args: any) => {
+ipcMain.on("loadIncomeTrend", (event: Event, args: TimePeriod) => {
+  if (dao) {
+    /* Only process the request if the DAO has been setup */
+    dao.loadIncomeTrend(args)
+      .then(result => {
+        console.log("Loaded income trend");
+        console.log(result);
+
+        event.returnValue = result;
+      }, (error) => {
+        console.log("Failed to load income trend: ");
+        console.log(error);
+      })
+  }
+});
+
+ipcMain.on("loadAccountInOutSummary", (event: Event, args: any) => {
   if (dao) {
     dao.loadAccountInOutSummary(args)
       .then(result => {
@@ -147,7 +163,7 @@ ipcMain.on("loadAccountInOutSummary", (event: any, args: any) => {
   }
 });
 
-ipcMain.on("loadBucketInOutSummary", (event: any, args: any) => {
+ipcMain.on("loadBucketInOutSummary", (event: Event, args: any) => {
   if (dao) {
     dao.loadBucketInOutSummary(args)
       .then(result => {
@@ -159,7 +175,7 @@ ipcMain.on("loadBucketInOutSummary", (event: any, args: any) => {
   }
 });
 
-ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => {
+ipcMain.on("loadDailyAccountBalances", (event: Event, args: TransactionFilter) => {
   if (dao && args.dateRange) {
     dao.loadAccountsWithBalance(args.dateRange.start)
       .then((result: Account[]) => {
@@ -179,7 +195,7 @@ ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => 
 
             /* Work out the daily worth */
             let runningTotal = initialBalance;
-            let dailyWorth: DateTotal[] = totals
+            let dataPoints: DateTotal[] = totals
               .map(value => {
                 runningTotal += value.total;
                 return {
@@ -189,9 +205,9 @@ ipcMain.on("loadDailyAccountBalances", (event: any, args: TransactionFilter) => 
               });
 
             /* Make the response object */
-            let response: DailyWorth = {
+            let response: NetWorth = {
               initialBalance: initialBalance,
-              dailyWorth: dailyWorth
+              dataPoints: dataPoints
             };
 
             console.log(response);

@@ -41,16 +41,23 @@ export class DateTotal {
     total: number;
 }
 
-export class DailyWorth {
-    initialBalance: number;
-    dailyWorth: DateTotal[];
-}
-
 export class InOutSummary {
     id: number;
     name: string;
     moneyIn: number;
     moneyOut: number;
+}
+
+export class NetWorth {
+    initialBalance: number;
+    dataPoints: DateTotal[];
+}
+
+export enum TimePeriod {
+    DAY,
+    WEEK,
+    MONTH,
+    YEAR
 }
 
 export class Transaction {
@@ -88,4 +95,9 @@ export enum TransactionStatus {
     Cleared = 2,
     Open = 3,
     Pending = 4
+}
+
+export class TrendData {
+    label: string;
+    dataPoints: DateTotal[];
 }
