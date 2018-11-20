@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions, Event } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
-import { TransactionFilter, Account, NetWorth, DateTotal, TimePeriod } from './model';
+import { TransactionFilter, Account, NetWorth, DateTotal, TimePeriod, TrendFilter } from './model';
 
 let mainWindow: Electron.BrowserWindow;
 let menu: Electron.Menu;
@@ -135,7 +135,7 @@ ipcMain.on("loadTransactions", (event: Event, args: any) => {
   }
 });
 
-ipcMain.on("loadIncomeTrend", (event: Event, args: TimePeriod) => {
+ipcMain.on("loadIncomeTrend", (event: Event, args: TrendFilter) => {
   if (dao) {
     /* Only process the request if the DAO has been setup */
     dao.loadIncomeTrend(args)

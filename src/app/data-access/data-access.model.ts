@@ -102,3 +102,9 @@ export class TrendData {
     label: string;
     dataPoints: DateTotal[];
 }
+
+export class TrendFilter {
+    timePeriod: TimePeriod;
+    //yyyyMMdd string
+    startDate: string;
+}

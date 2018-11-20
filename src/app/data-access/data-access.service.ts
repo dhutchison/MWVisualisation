@@ -8,7 +8,8 @@ import {
     TransactionFilter, 
     Transaction, 
     TimePeriod,
-    TrendData} from './data-access.model'
+    TrendData,
+    TrendFilter} from './data-access.model'
 
 @Injectable({
   providedIn: 'root'
@@ -57,9 +58,9 @@ export class DataAccessService {
     });
   }
 
-  loadIncomeTrend(timePeriod: TimePeriod = TimePeriod.DAY) : Promise<TrendData[]> {
+  loadIncomeTrend(trendFilter: TrendFilter) : Promise<TrendData[]> {
     return new Promise<TrendData[]>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync("loadIncomeTrend", timePeriod);
+      let result = this._electronService.ipcRenderer.sendSync("loadIncomeTrend", trendFilter);
       resolve(result);
     });
   }

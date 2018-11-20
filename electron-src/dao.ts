@@ -1,5 +1,5 @@
 import { Database, Statement } from 'sqlite3';
-import { Account, Bucket, Transaction, TransactionFilter, InOutSummary, DateTotal, TransactionStatus, TransactionType, TimePeriod, TrendData } from './model';
+import { Account, Bucket, Transaction, TransactionFilter, InOutSummary, DateTotal, TransactionStatus, TransactionType, TimePeriod, TrendData, TrendFilter } from './model';
 
 /* Notes:
 
@@ -103,18 +103,21 @@ export class MoneyWellDAO {
         return this.all(query, queryParams);
     }
 
-    loadIncomeTrend(timePeriod: TimePeriod) : Promise<TrendData[]> {
+    loadIncomeTrend(trendFilter: TrendFilter) : Promise<TrendData[]> {
 
       let queryParams: any[] = [TransactionStatus.Voided];
       //TODO: Parameter
-      queryParams.push('20170101');
+      queryParams.push(trendFilter.startDate);
 
       // TODO: Implement time period support
       let dateQueryPart: string;
-      switch (timePeriod) {
+      switch (trendFilter.timePeriod) {
         //TODO: Week support
         case TimePeriod.DAY:
           dateQueryPart = 't.ZDATEYMD'
+          break;
+        case TimePeriod.WEEK:
+          dateQueryPart = "(substr(t.ZDATEYMD, 1, 4) || '/' || strftime('%W', (substr(t.ZDATEYMD, 1, 4) || '-' || substr(t.ZDATEYMD, 5, 2) || '-' || substr(t.ZDATEYMD, 7) )))";
           break;
         case TimePeriod.MONTH:
           dateQueryPart = 'substr(t.ZDATEYMD, 0, length(t.ZDATEYMD) -1)';
@@ -138,6 +141,9 @@ export class MoneyWellDAO {
         'GROUP BY b.Z_PK, ' + dateQueryPart + ' ' +
         'ORDER BY t.ZDATEYMD';
 
+      console.log("Loading income trend data")
+      console.log(query);
+      console.log(queryParams);
       
       let results = new Map<number, TrendData>();
 

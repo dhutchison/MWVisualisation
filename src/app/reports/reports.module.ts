@@ -1,21 +1,26 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { NgxMatDrpModule } from 'ngx-mat-daterange-picker';
 
 import { 
+    MatButtonModule, 
+    MatCardModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
     MatListModule,
     MatGridListModule,
     MatIconModule, 
+    MatInputModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatSidenavModule, 
     MatSortModule,
     MatTableModule,
     MatTabsModule,
-    MatToolbarModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatSelectModule,
-    MatCheckboxModule, MatButtonModule, MatSidenavModule
+    MatToolbarModule
   } from '@angular/material';
 
 import { BucketSummaryComponent } from './bucket-summary/bucket-summary.component';
@@ -28,7 +33,6 @@ import { AccountListComponent } from './filter/accounts/account-list/account-lis
 import { TransactionEditorComponent } from './transaction-list/transaction-editor/transaction-editor.component';
 import { AccountsService } from './filter/accounts/accounts.service';
 import { TransactionsService } from './transactions.service';
-import { ReactiveFormsModule } from '@angular/forms';
 import { IncomeTrendComponent } from './income-trend/income-trend.component';
 
 const routes: Routes = [
@@ -46,6 +50,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
 
+    FormsModule,
     ReactiveFormsModule,
 
     /* Material date range picker component */
@@ -53,12 +58,14 @@ const routes: Routes = [
 
     /* Angular Material Components */
     MatButtonModule,
+    MatCardModule,
     MatCheckboxModule,
     MatDatepickerModule,
     MatGridListModule,
     MatIconModule,
     MatInputModule,
     MatListModule,
+    MatRadioModule,
     MatSelectModule,
     MatSidenavModule,
     MatSortModule,

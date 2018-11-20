@@ -4,7 +4,7 @@ import * as pallete from 'google-palette';
 
 import { Chart, ChartDataSets } from 'chart.js';
 import { DataAccessService } from 'src/app/data-access/data-access.service';
-import { TrendData, TimePeriod, DateTotal } from 'src/app/data-access/data-access.model';
+import { TrendData, TimePeriod, DateTotal, TrendFilter } from 'src/app/data-access/data-access.model';
 
 @Component({
   selector: 'app-income-trend',
@@ -13,7 +13,11 @@ import { TrendData, TimePeriod, DateTotal } from 'src/app/data-access/data-acces
 })
 export class IncomeTrendComponent implements OnInit {
 
+  private _timePeriod: string = 'YEAR';
+  private _startDate: Date = new Date(new Date().getFullYear() - 1, 0, 1);;
+
   private trendData: TrendData[];
+
 
   @ViewChild('incomeTrendChart') myChartRef: ElementRef;
   chartObj: Chart;
@@ -24,7 +28,42 @@ export class IncomeTrendComponent implements OnInit {
 
   ngOnInit() {
 
-    this._dataAccessService.loadIncomeTrend(TimePeriod.YEAR)
+    this.reloadData();
+  }
+
+  get startDate() {
+    return this._startDate;
+  }
+
+  set startDate(startDate: any) {
+    console.log(startDate);
+    this._startDate = startDate;
+
+    this.reloadData();
+  }
+
+  get timePeriod() {
+    return this._timePeriod;
+  }
+
+  set timePeriod(timePeriod: string) {
+    this._timePeriod = timePeriod;
+
+    console.log("Setting to ")
+    console.log(timePeriod);
+    console.log(TimePeriod[timePeriod]);
+
+    this.reloadData();
+  }
+
+  private reloadData(): void {
+
+    let trendFilter: TrendFilter = {
+      startDate: this.getDateString(this._startDate),
+      timePeriod: TimePeriod[this._timePeriod]
+    };
+
+    this._dataAccessService.loadIncomeTrend(trendFilter)
       .then((value) => {
         this.trendData = value;
         console.log('Data Loaded')
@@ -35,6 +74,19 @@ export class IncomeTrendComponent implements OnInit {
       .catch((err) => {
         //TODO: Implement
       });
+  }
+
+  getTimePeriods(): string[] {
+    return Object.keys(TimePeriod).filter(k => typeof TimePeriod[k as any] === "number");
+  }
+
+  private getDateString(input: Date): string {
+    /* Need to handle timezones too.
+    * Based on answer and comments to 
+    * https://stackoverflow.com/a/16714931/230449 */
+    let workingDate = new Date(input);
+    workingDate.setMinutes(workingDate.getMinutes() - workingDate.getTimezoneOffset()); 
+    return workingDate.toISOString().slice(0,10).replace(/-/g,"");
   }
 
   private createChart() {
@@ -95,7 +147,14 @@ export class IncomeTrendComponent implements OnInit {
           datasets: dataSets
         },
         options: {
-
+          scales: {
+              xAxes: [{
+                  stacked: true
+              }],
+              yAxes: [{
+                  stacked: true
+              }]
+          }
         }
       });
 
@@ -113,30 +172,25 @@ export class IncomeTrendComponent implements OnInit {
 
       let labelMatch = false;
 
-      while (!labelMatch && labelIndex < array.length) {
-        console.log("In loop:")
-        console.log(labels[labelIndex]);
-        console.log(value.date);
-        console.log(labelMatch);
-        console.log(labelIndex);
-        console.log(array.length);
+      while (!labelMatch && labelIndex < labels.length) {
+        
         if (labels[labelIndex] === value.date) {
           /* If the data point is for the current label, add it */
-          console.log('Match0!');
-          console.log(dataNumbers);
-          console.log(value.total);
+          // console.log('Match0!');
+          // console.log(dataNumbers);
+          // console.log(value.total);
           dataNumbers.push(value.total);
           labelMatch = true;
-          console.log('Match1!');
+          // console.log('Match1!');
         } else {
+          /* Add in a zero - if we were doing a line chart then NaN would be more appropriate */
+          dataNumbers.push(0);
           /* Otherwise add in a NaN as we don't have data for this label in this data set */
-          console.log('No Match0!')
-          dataNumbers.push(NaN);
-          console.log('No Match1!')
+          // console.log('No Match0!')
+          // dataNumbers.push(NaN);
+          // console.log('No Match1!')
         }
         labelIndex += 1;
-        console.log('New label index')
-        console.log(labelIndex);
       }
 
     });
