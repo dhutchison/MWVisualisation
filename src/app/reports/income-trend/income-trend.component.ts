@@ -13,182 +13,24 @@ import { TrendData, TimePeriod, DateTotal, TrendFilter } from 'src/app/data-acce
 })
 export class IncomeTrendComponent implements OnInit {
 
-  private _timePeriod = 'YEAR';
-  private _startDate: Date = new Date(new Date().getFullYear() - 1, 0, 1);
-
   private trendData: TrendData[];
-
-
-  @ViewChild('incomeTrendChart') myChartRef: ElementRef;
-  chartObj: Chart;
 
   constructor(
     private _dataAccessService: DataAccessService
   ) { }
 
   ngOnInit() {
-
-    this.reloadData();
   }
 
-  get startDate() {
-    return this._startDate;
-  }
-
-  set startDate(startDate: any) {
-    console.log(startDate);
-    this._startDate = startDate;
-
-    this.reloadData();
-  }
-
-  get timePeriod() {
-    return this._timePeriod;
-  }
-
-  set timePeriod(timePeriod: string) {
-    this._timePeriod = timePeriod;
-
-    console.log('Setting to ');
-    console.log(timePeriod);
-    console.log(TimePeriod[timePeriod]);
-
-    this.reloadData();
-  }
-
-  private reloadData(): void {
-
-    const trendFilter: TrendFilter = {
-      startDate: this.getDateString(this._startDate),
-      timePeriod: TimePeriod[this._timePeriod]
-    };
-
-    this._dataAccessService.loadIncomeTrend(trendFilter)
+  onFilterChanged(filter: TrendFilter): void{
+    this._dataAccessService.loadIncomeTrend(filter)
       .then((value) => {
-        this.trendData = value;
         console.log('Data Loaded');
-        console.log(this.trendData);
-
-        this.createChart();
+        console.log(value);
+        this.trendData = value;
       })
       .catch((err) => {
         // TODO: Implement
       });
   }
-
-  getTimePeriods(): string[] {
-    return Object.keys(TimePeriod).filter(k => typeof TimePeriod[k as any] === 'number');
-  }
-
-  private getDateString(input: Date): string {
-    /* Need to handle timezones too.
-    * Based on answer and comments to
-    * https://stackoverflow.com/a/16714931/230449 */
-    const workingDate = new Date(input);
-    workingDate.setMinutes(workingDate.getMinutes() - workingDate.getTimezoneOffset());
-    return workingDate.toISOString().slice(0, 10).replace(/-/g, '');
-  }
-
-  private createChart() {
-
-    /* Get all the distinct labels for the combined data sets */
-    const labelSet = new Set<string>();
-    this.trendData.forEach(trendDataSet => {
-        trendDataSet.dataPoints.forEach(dataPoint => labelSet.add(dataPoint.date));
-      });
-
-    const labels = Array.from(labelSet).sort();
-
-    /* Define the colours we can use */
-    /* Need to stick to one of the following to not hit colour limits.
-     * If the limit is hit, null is returned from the pallete function.
-     * mpn65
-     * tol-dv (colourblind friendly)
-     * tol-sq (colourblind friendly)
-     * tol-rainbow (colourblind friendly)
-     */
-    const colours = pallete('tol-rainbow', this.trendData.length)
-      .map((hex) => {
-        return '#' + hex;
-      });
-
-    console.log('Chart labels:');
-    console.log(labels);
-
-    /* Set up the data sets */
-    const dataSets: ChartDataSets[] = [];
-
-    this.trendData.forEach((trendDataSet: TrendData, index: number) => {
-      console.log(trendDataSet);
-
-      const dataPoints: number[] = this.getDataNumbers(trendDataSet.dataPoints, labels);
-
-      const dataSet: ChartDataSets = {
-        data: dataPoints,
-        label: trendDataSet.label,
-        backgroundColor: colours[index]
-      };
-      dataSets.push(dataSet);
-    });
-
-    console.log('Chart Datasets: ');
-    console.log(dataSets);
-
-    if (this.chartObj !== undefined) {
-      this.chartObj.destroy();
-    }
-
-    this.chartObj = new Chart((<HTMLCanvasElement>this.myChartRef.nativeElement),
-      {
-        // TODO: Stacked varient to show how total income for the period has been made up?
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: dataSets
-        },
-        options: {
-          scales: {
-              xAxes: [{
-                  stacked: true
-              }],
-              yAxes: [{
-                  stacked: true
-              }]
-          }
-        }
-      });
-
-  }
-
-  private getDataNumbers(array: DateTotal[], labels: string[]): number[] {
-
-    const dataNumbers: number[] = [];
-    let labelIndex = 0;
-
-    array.forEach((value) => {
-      console.log('In array forEach');
-      console.log(value);
-      console.log(labelIndex);
-
-      let labelMatch = false;
-
-      while (!labelMatch && labelIndex < labels.length) {
-
-        if (labels[labelIndex] === value.date) {
-          /* If the data point is for the current label, add it */
-          dataNumbers.push(value.total);
-          labelMatch = true;
-        } else {
-          /* Add in a zero - if we were doing a line chart then NaN would be more appropriate */
-          dataNumbers.push(0);
-          /* Otherwise add in a NaN as we don't have data for this label in this data set */
-        }
-        labelIndex += 1;
-      }
-
-    });
-
-    return dataNumbers;
-  }
-
 }

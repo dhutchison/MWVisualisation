@@ -6,6 +6,11 @@ import { Chart } from 'chart.js';
 import { TransactionsService } from 'src/app/reports/transactions.service';
 import { DailyWorth } from 'src/app/data-access/data-access.model';
 
+/* TODO:
+ * This should effectively be replaced with data loading logic, but then delegate to a trend
+ * data component for the graphing functionality.
+*/
+
 @Component({
   selector: 'app-net-worth',
   templateUrl: './net-worth.component.html',
@@ -42,10 +47,12 @@ export class NetWorthComponent implements OnInit, OnDestroy {
     const labels: string[] = [];
     const dataPoints: number[] = [];
 
-    this.dailyWorth.dailyWorth.forEach((value) => {
-      labels.push(value.date);
-      dataPoints.push(value.total);
-    });
+    if (this.dailyWorth && this.dailyWorth.dailyWorth) {
+      this.dailyWorth.dailyWorth.forEach((value) => {
+        labels.push(value.date);
+        dataPoints.push(value.total);
+      });
+    }
 
     if (this.chartObj !== undefined) {
       this.chartObj.destroy();

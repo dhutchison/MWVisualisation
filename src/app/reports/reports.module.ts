@@ -34,6 +34,8 @@ import { TransactionEditorComponent } from './transaction-list/transaction-edito
 import { AccountsService } from './filter/accounts/accounts.service';
 import { TransactionsService } from './transactions.service';
 import { IncomeTrendComponent } from './income-trend/income-trend.component';
+import { TrendPeriodFilterComponent } from './filter/trend-period-filter/trend-period-filter.component';
+import { TrendGraphComponent } from './trend-graph/trend-graph.component';
 
 const routes: Routes = [
   { path: '', component: ReportsComponent, children: [
@@ -87,6 +89,8 @@ const routes: Routes = [
     TransactionFilterComponent,
     TransactionListComponent,
     IncomeTrendComponent,
+    TrendPeriodFilterComponent,
+    TrendGraphComponent,
   ],
   providers: [
     AccountsService,

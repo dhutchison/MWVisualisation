@@ -1,22 +1,8 @@
 <div>
-  <mat-card class="filter-card">
-    <mat-card-header>
-      <mat-card-title>Options</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-form-field>
-        <input matInput [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="startDate">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-      <mat-radio-group class="example-radio-group" [(ngModel)]="timePeriod">
-          <mat-radio-button class="example-radio-button" *ngFor="let value of getTimePeriods()" [value]="value">
-            {{value}}
-          </mat-radio-button>
-        </mat-radio-group>
-    </mat-card-content>
-  </mat-card>
-  <div id="chartContainer" style="height: 370px; width: 100%;">
-    <canvas #incomeTrendChart></canvas>
-  </div>
+  <app-trend-period-filter
+    (filterChanged)="onFilterChanged($event)">
+  </app-trend-period-filter>
+  <app-trend-graph
+    [trendData]="trendData">
+  </app-trend-graph>
 </div>
