@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions, Event } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
-import { TransactionFilter, Account, NetWorth, DateTotal, TimePeriod, TrendFilter } from './model';
+import { TransactionFilter, Account, NetWorth, DateTotal, TimePeriod, TrendFilter, BucketType } from './model';
 
 let mainWindow: Electron.BrowserWindow;
 let menu: Electron.Menu;
@@ -16,10 +16,10 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "app/index.html"));
+  mainWindow.loadFile(path.join(__dirname, 'app/index.html'));
 
   // Emitted when the window is closed.
-  mainWindow.on("closed", () => {
+  mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -34,7 +34,7 @@ function createWindow() {
 
 function openFile() {
 
-  let options: OpenDialogOptions = {
+  const options: OpenDialogOptions = {
     properties: ['openFile']
   };
 
@@ -47,21 +47,21 @@ function openFile() {
     dao.connect()
       .then(() => {
         /* Send a message that a file was opened */
-        mainWindow.webContents.send("databaseOpened");
+        mainWindow.webContents.send('databaseOpened');
 
         /* On connect, initially load the accounts */
         dao.loadAccounts()
           .then(result => {
-            console.log("loaded")
+            console.log('loaded');
             console.log(result);
 
-            mainWindow.webContents.send("accountsLoaded", result);
+            mainWindow.webContents.send('accountsLoaded', result);
           }, (error) => {
-            console.log("Failed to load accounts: ");
+            console.log('Failed to load accounts: ');
             console.log(error);
           });
       }).catch((error) => {
-        console.log("Failed to connect");
+        console.log('Failed to connect');
         console.log(error);
       });
 
@@ -119,74 +119,90 @@ function createMenu() {
   Menu.setApplicationMenu(menu);
 }
 
-ipcMain.on("loadTransactions", (event: Event, args: any) => {
+ipcMain.on('loadTransactions', (event: Event, args: any) => {
   if (dao) {
     /* Only process the request if the DAO has been setup */
     dao.loadTransactions(args)
       .then(result => {
-        console.log("loaded transactions")
+        console.log('loaded transactions');
         console.log(result);
 
         event.returnValue = result;
       }, (error) => {
-        console.log("Failed to load transactions: ");
+        console.log('Failed to load transactions: ');
         console.log(error);
       });
   }
 });
 
-ipcMain.on("loadIncomeTrend", (event: Event, args: TrendFilter) => {
+ipcMain.on('loadIncomeTrend', (event: Event, args: TrendFilter) => {
   if (dao) {
     /* Only process the request if the DAO has been setup */
-    dao.loadIncomeTrend(args)
+    dao.loadBucketTypeTrend(args, BucketType.Income)
       .then(result => {
-        console.log("Loaded income trend");
+        console.log('Loaded income trend');
         console.log(result);
 
         event.returnValue = result;
       }, (error) => {
-        console.log("Failed to load income trend: ");
+        console.log('Failed to load income trend: ');
         console.log(error);
-      })
+      });
   }
 });
 
-ipcMain.on("loadAccountInOutSummary", (event: Event, args: any) => {
+ipcMain.on('loadExpenseTrend', (event: Event, args: TrendFilter) => {
+  if (dao) {
+    /* Only process the request if the DAO has been setup */
+    dao.loadBucketTypeTrend(args, BucketType.Expense)
+      .then(result => {
+        console.log('Loaded expense trend');
+        console.log(result);
+
+        event.returnValue = result;
+      }, (error) => {
+        console.log('Failed to load expense trend: ');
+        console.log(error);
+      });
+  }
+});
+
+ipcMain.on('loadAccountInOutSummary', (event: Event, args: any) => {
   if (dao) {
     dao.loadAccountInOutSummary(args)
       .then(result => {
         event.returnValue = result;
       }, (error) => {
-        console.log("Failed to load account in/out summary: ");
+        console.log('Failed to load account in/out summary: ');
         console.log(error);
-      })
+      });
   }
 });
 
-ipcMain.on("loadBucketInOutSummary", (event: Event, args: any) => {
+ipcMain.on('loadBucketInOutSummary', (event: Event, args: any) => {
   if (dao) {
     dao.loadBucketInOutSummary(args)
       .then(result => {
         event.returnValue = result;
       }, (error) => {
-        console.log("Failed to load bucket in/out summary: ");
+        console.log('Failed to load bucket in/out summary: ');
         console.log(error);
-      })
+      });
   }
 });
 
-ipcMain.on("loadDailyAccountBalances", (event: Event, args: TransactionFilter) => {
+ipcMain.on('loadDailyAccountBalances', (event: Event, args: TransactionFilter) => {
   if (dao && args.dateRange) {
     dao.loadAccountsWithBalance(args.dateRange.start)
       .then((result: Account[]) => {
 
 
-        let filterAccountIDs: number[] = args.accounts.map(a => a.id);
+        const filterAccountIDs: number[] = args.accounts.map(a => a.id);
 
         dao.loadDailyTransactionTotals(args)
           .then(totals => {
             /* Get the initial balance for the filter accounts */
-            let initialBalance = result
+            const initialBalance = result
               .filter(value => {
                 return filterAccountIDs.includes(value.id);
               })
@@ -195,17 +211,17 @@ ipcMain.on("loadDailyAccountBalances", (event: Event, args: TransactionFilter) =
 
             /* Work out the daily worth */
             let runningTotal = initialBalance;
-            let dataPoints: DateTotal[] = totals
+            const dataPoints: DateTotal[] = totals
               .map(value => {
                 runningTotal += value.total;
                 return {
                   date: value.date,
                   total: runningTotal
-                }
+                };
               });
 
             /* Make the response object */
-            let response: NetWorth = {
+            const response: NetWorth = {
               initialBalance: initialBalance,
               dataPoints: dataPoints
             };
@@ -214,11 +230,11 @@ ipcMain.on("loadDailyAccountBalances", (event: Event, args: TransactionFilter) =
 
             event.returnValue = response;
           }, (error2) => {
-            console.log("Failed to load daily transaction totals: ");
+            console.log('Failed to load daily transaction totals: ');
             console.log(error2);
-          })
+          });
       }, (error) => {
-        console.log("Failed to load acounts with initial balances: ");
+        console.log('Failed to load acounts with initial balances: ');
         console.log(error);
       });
 
@@ -234,21 +250,21 @@ ipcMain.on("loadDailyAccountBalances", (event: Event, args: TransactionFilter) =
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", () => {
+app.on('ready', () => {
   createWindow();
   createMenu();
 });
 
 // Quit when all windows are closed.
-app.on("window-all-closed", () => {
+app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== "darwin") {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-app.on("activate", () => {
+app.on('activate', () => {
   // On OS X it"s common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {

@@ -10,7 +10,8 @@ import {
     TransactionType,
     TimePeriod,
     TrendData,
-    TrendFilter
+    TrendFilter,
+    BucketType
   } from './model';
 
 /* Notes:
@@ -115,13 +116,15 @@ export class MoneyWellDAO {
         return this.all(query, queryParams);
     }
 
-    loadIncomeTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
+    loadBucketTypeTrend(trendFilter: TrendFilter, bucketType: BucketType): Promise<TrendData[]> {
 
-      const queryParams: any[] = [TransactionStatus.Voided];
-      // TODO: Parameter
+      /* Setup the query parameters */
+      const queryParams: any[] = [];
+      queryParams.push(bucketType);
+      queryParams.push(TransactionStatus.Voided);
       queryParams.push(trendFilter.startDate);
 
-      // TODO: Implement time period support
+      /* Setup the grouping part of the query for the time period */
       let dateQueryPart: string;
       switch (trendFilter.timePeriod) {
         case TimePeriod.DAY:
@@ -148,7 +151,7 @@ export class MoneyWellDAO {
         'FROM ZBUCKET b ' +
         'INNER JOIN ZACTIVITY t ON b.Z_PK = t.ZBUCKET2 ' +
         'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK ' +
-        'WHERE b.ZTYPE = 1 ' +
+        'WHERE b.ZTYPE = ? ' +
         'AND a.ZINCLUDEINCASHFLOW=1 ' +
         'AND ZSTATUS != ?  ' +
         'AND t.ZDATEYMD > ? ' +

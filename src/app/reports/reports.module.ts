@@ -36,6 +36,7 @@ import { TransactionsService } from './transactions.service';
 import { IncomeTrendComponent } from './income-trend/income-trend.component';
 import { TrendPeriodFilterComponent } from './filter/trend-period-filter/trend-period-filter.component';
 import { TrendGraphComponent } from './trend-graph/trend-graph.component';
+import { ExpenseTrendComponent } from './expense-trend/expense-trend.component';
 
 const routes: Routes = [
   { path: '', component: ReportsComponent, children: [
@@ -43,7 +44,8 @@ const routes: Routes = [
     { path: 'bucket-summary', component: BucketSummaryComponent },
     { path: 'transactions', component: TransactionListComponent },
     { path: 'net-worth', component : NetWorthComponent },
-    { path: 'income-trend', component: IncomeTrendComponent }
+    { path: 'income-trend', component: IncomeTrendComponent },
+    { path: 'expense-trend', component: ExpenseTrendComponent }
   ]}
 ];
 
@@ -91,6 +93,7 @@ const routes: Routes = [
     IncomeTrendComponent,
     TrendPeriodFilterComponent,
     TrendGraphComponent,
+    ExpenseTrendComponent,
   ],
   providers: [
     AccountsService,
