@@ -22,7 +22,7 @@ export class IncomeTrendComponent implements OnInit {
   ngOnInit() {
   }
 
-  onFilterChanged(filter: TrendFilter): void{
+  onFilterChanged(filter: TrendFilter): void {
     this._dataAccessService.loadIncomeTrend(filter)
       .then((value) => {
         console.log('Data Loaded');
