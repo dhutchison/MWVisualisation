@@ -1,3 +1,5 @@
+/* Disable the no commented out code linting rules just for this file */
+/* tslint:disable:no-commented-code */
 /**
  * This file includes polyfills needed by Angular and is loaded before the app.
  * You can add your own extra polyfills to this file.

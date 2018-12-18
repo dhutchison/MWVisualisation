@@ -20,24 +20,24 @@ export class TransactionsService {
   });
 
   /* Date ranges are yyyyMMdd strings */
-  private _filter: TransactionFilter = {}
+  private _filter: TransactionFilter = {};
 
   constructor(
     private _accountsService: AccountsService,
-    private _dataAccessService: DataAccessService) { 
-    
+    private _dataAccessService: DataAccessService) {
+
     /* Subscribe to changes in the accounts selected */
     this._accountsService.selectedAccountsSubject.subscribe((value) => {
-      console.log("Transaction service sees accounts");
+      console.log('Transaction service sees accounts');
       console.log(value);
       this._filter.accounts = value;
-      this.reloadTransactions()
+      this.reloadTransactions();
     });
   }
 
   set dateRange(date: {fromDate: Date, toDate: Date}) {
-    
-    let filterRange = {
+
+    const filterRange = {
       start: this.getDateString(date.fromDate),
       end: this.getDateString(date.toDate)
     };
@@ -49,16 +49,16 @@ export class TransactionsService {
 
   private getDateString(input: Date): string {
     /* Need to handle timezones too.
-    * Based on answer and comments to 
+    * Based on answer and comments to
     * https://stackoverflow.com/a/16714931/230449 */
-    let workingDate = new Date(input);
-    workingDate.setMinutes(workingDate.getMinutes() - workingDate.getTimezoneOffset()); 
-    return workingDate.toISOString().slice(0,10).replace(/-/g,"");
+    const workingDate = new Date(input);
+    workingDate.setMinutes(workingDate.getMinutes() - workingDate.getTimezoneOffset());
+    return workingDate.toISOString().slice(0, 10).replace(/-/g, '');
   }
 
   /**
    * Reload the transaction data via the data access service
-   * 
+   *
    * TODO: Refactor to split work
    */
   private reloadTransactions(): void {

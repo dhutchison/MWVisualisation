@@ -1,9 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 
-import { Subscription } from 'rxjs'
+import { Subscription } from 'rxjs';
 
-import { Account, TransactionStatus, TransactionType, Transaction } from 'src/app/data-access/data-access.model';
+import {
+    Account,
+    TransactionStatus,
+    TransactionType,
+    Transaction
+  } from 'src/app/data-access/data-access.model';
 import { DataAccessService } from 'src/app/data-access/data-access.service';
 
 @Component({
@@ -24,7 +29,7 @@ export class TransactionEditorComponent implements OnInit, OnDestroy {
     status: new FormControl(''),
     accountId: new FormControl(''),
     transferToAccountId: new FormControl(''),
-    //TODO: Missing attachments
+    // TODO: Missing attachments
 
   });
 
@@ -49,12 +54,12 @@ export class TransactionEditorComponent implements OnInit, OnDestroy {
     this.accountsSub.unsubscribe();
   }
 
-  getTransactionTypes() : string[] {
-    return Object.keys(TransactionType).filter(k => typeof TransactionType[k as any] === "number");
+  getTransactionTypes(): string[] {
+    return Object.keys(TransactionType).filter(k => typeof TransactionType[k as any] === 'number');
   }
 
   getStatuses(): string[] {
-    return Object.keys(TransactionStatus).filter(k => typeof TransactionStatus[k as any] === "number");
+    return Object.keys(TransactionStatus).filter(k => typeof TransactionStatus[k as any] === 'number');
   }
 
 }

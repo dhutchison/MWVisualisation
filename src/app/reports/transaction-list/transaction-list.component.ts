@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { TransactionsService } from '../transactions.service'
+import { TransactionsService } from '../transactions.service';
 import { Transaction, Account } from '../../data-access/data-access.model';
 import { Subscription } from 'rxjs';
 
@@ -17,7 +17,7 @@ export class TransactionListComponent implements OnInit, OnDestroy {
 
   readonly displayedColumns: string[] = ['date', 'payee', 'amount'];
   transactions: Transaction[] = [];
-  
+
   readonly accounts: Map<number, Account> = new Map();
 
   dataSource = new MatTableDataSource(this.transactions);
@@ -33,7 +33,7 @@ export class TransactionListComponent implements OnInit, OnDestroy {
     private _accountsService: AccountsService) { }
 
   ngOnInit() {
-    
+
     this.dataSource.sort = this.sort;
 
     this._accountsSubscription = this._accountsService.selectedAccountsSubject.subscribe(
@@ -62,7 +62,7 @@ export class TransactionListComponent implements OnInit, OnDestroy {
       currencyCode = this.accounts.get(transaction.accountId).currencyCode;
     } else {
       /* No transaction applied, default to the first accout in the map */
-      let account = this.accounts.get(this.accounts.keys().next().value);
+      const account = this.accounts.get(this.accounts.keys().next().value);
       if (account) {
         /* If there are any accounts loaded */
         currencyCode = account.currencyCode;

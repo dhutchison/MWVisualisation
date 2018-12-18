@@ -5,18 +5,18 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { NgxMatDrpModule } from 'ngx-mat-daterange-picker';
 
-import { 
-    MatButtonModule, 
+import {
+    MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
     MatDatepickerModule,
     MatListModule,
     MatGridListModule,
-    MatIconModule, 
+    MatIconModule,
     MatInputModule,
     MatRadioModule,
     MatSelectModule,
-    MatSidenavModule, 
+    MatSidenavModule,
     MatSortModule,
     MatTableModule,
     MatTabsModule,
@@ -43,7 +43,7 @@ const routes: Routes = [
     { path: 'net-worth', component : NetWorthComponent },
     { path: 'income-trend', component: IncomeTrendComponent }
   ]}
-]
+];
 
 @NgModule({
   imports: [
@@ -79,7 +79,7 @@ const routes: Routes = [
   ],
   declarations: [
     AccountListComponent,
-    BucketSummaryComponent, 
+    BucketSummaryComponent,
     InOutReportComponent,
     NetWorthComponent,
     ReportsComponent,
@@ -87,9 +87,9 @@ const routes: Routes = [
     TransactionFilterComponent,
     TransactionListComponent,
     IncomeTrendComponent,
-  ], 
+  ],
   providers: [
-    AccountsService, 
+    AccountsService,
     TransactionsService
   ]
 })

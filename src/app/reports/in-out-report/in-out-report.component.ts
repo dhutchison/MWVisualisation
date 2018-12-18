@@ -35,9 +35,9 @@ export class InOutReportComponent implements OnInit, OnDestroy {
 
   createChart(): void {
 
-    let labels: string[] = [];
-    let inDataPoints: number[] = [];
-    let outDataPoints: number[] = [];
+    const labels: string[] = [];
+    const inDataPoints: number[] = [];
+    const outDataPoints: number[] = [];
 
     this._data.forEach((value) => {
       labels.push(value.name);

@@ -9,7 +9,7 @@ import { NgxElectronModule, ElectronService } from 'ngx-electron';
     NgxElectronModule
   ],
   exports: [
-    
+
   ],
   declarations: [],
   providers: [

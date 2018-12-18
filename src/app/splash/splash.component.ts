@@ -18,9 +18,9 @@ export class SplashComponent implements OnInit {
 
   ngOnInit() {
     this._dataAccessService.fileOpen.subscribe((value: boolean) => {
-      console.log("Database loaded?")
+      console.log('Database loaded?');
       console.log(value);
-      if(value) {
+      if (value) {
         this._router.navigate(
           [ 'reports' ]
         );

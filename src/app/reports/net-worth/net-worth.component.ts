@@ -39,8 +39,8 @@ export class NetWorthComponent implements OnInit, OnDestroy {
 
   private createChart() {
 
-    let labels: string[] = [];
-    let dataPoints: number[] = [];
+    const labels: string[] = [];
+    const dataPoints: number[] = [];
 
     this.dailyWorth.dailyWorth.forEach((value) => {
       labels.push(value.date);
@@ -51,7 +51,7 @@ export class NetWorthComponent implements OnInit, OnDestroy {
       this.chartObj.destroy();
     }
 
-    this.chartObj = new Chart((<HTMLCanvasElement>this.myChartRef.nativeElement), 
+    this.chartObj = new Chart((<HTMLCanvasElement>this.myChartRef.nativeElement),
       {
         type: 'line',
         data: {

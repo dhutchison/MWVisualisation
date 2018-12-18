@@ -12,7 +12,7 @@ export class AccountsService {
 
   readonly selectedAccountsSubject = new BehaviorSubject<Account[]>([]);
 
-  constructor() { 
+  constructor() {
 
   }
 
@@ -21,7 +21,7 @@ export class AccountsService {
   }
 
   set selectedAccounts(value: Account[]) {
-    console.log("Setting selected accounts in service");
+    console.log('Setting selected accounts in service');
     this._selectedAccounts = value;
     this.selectedAccountsSubject.next(this._selectedAccounts);
   }

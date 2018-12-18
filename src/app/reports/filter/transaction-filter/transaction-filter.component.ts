@@ -7,7 +7,7 @@ import { TransactionsService } from '../../transactions.service';
   templateUrl: './transaction-filter.component.html',
   styleUrls: ['./transaction-filter.component.css']
 })
-//TODO: This component should be a form
+// TODO: This component should be a form
 export class TransactionFilterComponent implements OnInit {
 
   range: Range = { fromDate: this.backDate(30), toDate: new Date() };
@@ -23,8 +23,8 @@ export class TransactionFilterComponent implements OnInit {
     this.options = {
       presets: this.presets,
       format: 'mediumDate',
-      range: {fromDate:this.backDate(30), toDate: today},
-      applyLabel: "Submit",
+      range: {fromDate: this.backDate(30), toDate: today},
+      applyLabel: 'Submit',
       calendarOverlayConfig: {
         // With these false we end up being able to open loads
         shouldCloseOnBackdropClick: true,
@@ -32,17 +32,17 @@ export class TransactionFilterComponent implements OnInit {
       }
     };
   }
-  
+
   // handler function that receives the updated date range object
-  updateRange(range: Range){
+  updateRange(range: Range) {
     this.range = range;
-    console.log("Got Range")
+    console.log('Got Range');
     console.log(this.range);
     this._transactionsService.dateRange = this.range;
-  }  
-  
+  }
+
   private backDate(numOfDays: number): Date {
-    let today = new Date();
+    const today = new Date();
     return new Date(today.setDate(today.getDate() - numOfDays));
   }
 
@@ -50,28 +50,28 @@ export class TransactionFilterComponent implements OnInit {
   setupPresets() {
     const today = new Date();
     const yesterday = this.backDate(1);
-    const minus7 = this.backDate(7)
+    const minus7 = this.backDate(7);
     const minus30 = this.backDate(30);
     const currMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    const currMonthEnd = new Date(today.getFullYear(), today.getMonth()+1, 0);
-    const lastMonthStart = new Date(today.getFullYear(), today.getMonth()-1, 1);
+    const currMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
-    
+
     this.presets =  [
       {
-        presetLabel: "Yesterday", range:{ fromDate:yesterday, toDate:today }
+        presetLabel: 'Yesterday', range: { fromDate: yesterday, toDate: today }
       },
       {
-        presetLabel: "Last 7 Days", range:{ fromDate: minus7, toDate:today }
+        presetLabel: 'Last 7 Days', range: { fromDate: minus7, toDate: today }
       },
       {
-        presetLabel: "Last 30 Days", range:{ fromDate: minus30, toDate:today }
+        presetLabel: 'Last 30 Days', range: { fromDate: minus30, toDate: today }
       },
       {
-        presetLabel: "This Month", range:{ fromDate: currMonthStart, toDate:currMonthEnd }
+        presetLabel: 'This Month', range: { fromDate: currMonthStart, toDate: currMonthEnd }
       },
       {
-        presetLabel: "Last Month", range:{ fromDate: lastMonthStart, toDate:lastMonthEnd }
+        presetLabel: 'Last Month', range: { fromDate: lastMonthStart, toDate: lastMonthEnd }
       }
     ];
   }
