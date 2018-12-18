@@ -42,8 +42,8 @@ export class BucketSummaryComponent implements OnInit, OnDestroy {
   }
 
   private createIncomeChart() {
-    let labels: string[] = [];
-    let dataPoints: number[] = [];
+    const labels: string[] = [];
+    const dataPoints: number[] = [];
 
     this._data.forEach((value) => {
       if (value.moneyIn > 0) {
@@ -60,8 +60,8 @@ export class BucketSummaryComponent implements OnInit, OnDestroy {
   }
 
   private createExpenseChart() {
-    let labels: string[] = [];
-    let dataPoints: number[] = [];
+    const labels: string[] = [];
+    const dataPoints: number[] = [];
 
     this._data.forEach((value) => {
       if (value.moneyOut > 0) {
@@ -86,12 +86,12 @@ export class BucketSummaryComponent implements OnInit, OnDestroy {
      * tol-sq (colourblind friendly)
      * tol-rainbow (colourblind friendly)
      */
-    let colours = pallete('tol-rainbow', dataPoints.length)
+    const colours = pallete('tol-rainbow', dataPoints.length)
       .map((hex) => {
         return '#' + hex;
       });
 
-    let chart = new Chart(element.nativeElement, {
+    return new Chart(element.nativeElement, {
       data: {
         datasets: [{
           data: dataPoints,
@@ -102,8 +102,6 @@ export class BucketSummaryComponent implements OnInit, OnDestroy {
       type: 'pie',
       options: {}
     });
-
-    return chart;
   }
 
 }

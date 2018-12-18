@@ -15,7 +15,7 @@ export class AccountListComponent implements OnInit, OnDestroy {
   private accountsSub: Subscription;
 
   accounts: Account[] = [];
-  accountFound: string = "No Accounts"
+  accountFound = 'No Accounts';
 
   constructor(
     private _accountsService: AccountsService,
@@ -26,8 +26,8 @@ export class AccountListComponent implements OnInit, OnDestroy {
     this.accountsSub = this._dataAccessService.accounts.subscribe(
       (value: Account[]) => {
         this.accounts = value;
-        this.accountFound = "Got Accounts";
-        console.log("Got accounts");
+        this.accountFound = 'Got Accounts';
+        console.log(this.accountFound);
         console.log(this.accounts);
       }
     );
@@ -35,7 +35,7 @@ export class AccountListComponent implements OnInit, OnDestroy {
 
   onSelectionChanged(event: MatSelectionListChange): void {
 
-    let selectedAccounts = [];
+    const selectedAccounts = [];
 
     event.source.selectedOptions.selected.forEach(element => {
       console.log(element.value);
@@ -45,11 +45,11 @@ export class AccountListComponent implements OnInit, OnDestroy {
     this._accountsService.selectedAccounts = selectedAccounts;
   }
 
-  getIconName(account: Account) : string {
+  getIconName(account: Account): string {
 
     let iconName: string;
 
-    if(account.type === AccountType.Credit) {
+    if (account.type === AccountType.Credit) {
       iconName = 'credit_card';
     } else if (account.type === AccountType.Checking) {
       iconName = 'account_balance';

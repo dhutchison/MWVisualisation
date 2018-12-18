@@ -2,14 +2,14 @@ import { Injectable, NgZone } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
 import { BehaviorSubject } from 'rxjs';
 
-import { 
+import {
     Account,
-    InOutSummary, 
-    TransactionFilter, 
-    Transaction, 
+    InOutSummary,
+    TransactionFilter,
+    Transaction,
     TimePeriod,
     TrendData,
-    TrendFilter} from './data-access.model'
+    TrendFilter} from './data-access.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,25 +23,25 @@ export class DataAccessService {
   readonly accounts = new BehaviorSubject<Account[]>([]);
 
   constructor(
-    private _electronService : ElectronService,
+    private _electronService: ElectronService,
     private _ngZone: NgZone
-  ) { 
+  ) {
     /* When a file is opened, pass this information on to subscribers */
-    this._electronService.ipcRenderer.on("databaseOpened", 
+    this._electronService.ipcRenderer.on('databaseOpened',
       () => {
         this._ngZone.run(() => {
-          this.fileOpen.next(true)
+          this.fileOpen.next(true);
         });
       });
 
     this._electronService.ipcRenderer.on(
-      "accountsLoaded", (event: any, arg: any) => {
-        console.log("data access service got:")
+      'accountsLoaded', (event: any, arg: any) => {
+        console.log('data access service got:');
         console.log(event);
         console.log(arg);
 
         /* Need to force this in to the Angular context
-         * See sample project referenced in 
+         * See sample project referenced in
          * https://github.com/ThorstenHans/ngx-electron/issues/2
          */
         this._ngZone.run(() => {
@@ -53,39 +53,39 @@ export class DataAccessService {
 
   loadTransactions(filter: TransactionFilter): Promise<Transaction[]> {
     return new Promise<Transaction[]>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync("loadTransactions", filter);
+      const result = this._electronService.ipcRenderer.sendSync('loadTransactions', filter);
       resolve(result);
     });
   }
 
-  loadIncomeTrend(trendFilter: TrendFilter) : Promise<TrendData[]> {
+  loadIncomeTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
     return new Promise<TrendData[]>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync("loadIncomeTrend", trendFilter);
+      const result = this._electronService.ipcRenderer.sendSync('loadIncomeTrend', trendFilter);
       resolve(result);
     });
   }
 
   loadAccountInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
-    return this.loadInOutSummary(filter, "loadAccountInOutSummary");
+    return this.loadInOutSummary(filter, 'loadAccountInOutSummary');
   }
 
   loadBucketInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
-    return this.loadInOutSummary(filter, "loadBucketInOutSummary");
+    return this.loadInOutSummary(filter, 'loadBucketInOutSummary');
   }
 
-  private loadInOutSummary(filter: TransactionFilter, dataLoadCommand: string): 
+  private loadInOutSummary(filter: TransactionFilter, dataLoadCommand: string):
     Promise<InOutSummary[]> {
 
     return new Promise<InOutSummary[]>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync(dataLoadCommand, filter);
+      const result = this._electronService.ipcRenderer.sendSync(dataLoadCommand, filter);
       resolve(result);
-    });  
+    });
 
   }
 
   loadDailyTrend(filter: TransactionFilter): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      let result = this._electronService.ipcRenderer.sendSync("loadDailyAccountBalances", filter);
+      const result = this._electronService.ipcRenderer.sendSync('loadDailyAccountBalances', filter);
       resolve(result);
     });
   }

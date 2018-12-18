@@ -5,7 +5,7 @@ export class Account {
     currencyCode: string;
     name: string;
     type: AccountType;
-    balance?: number
+    balance?: number;
 }
 
 /* ZTYPE field in ZACCOUNT is the account type */
@@ -85,7 +85,7 @@ export enum TransactionType {
     Deposit = 0,
     Withdrawal = 1,
     /*  Note this value has an additional associated Reference field, ZCHECKREF */
-    Check = 2 
+    Check = 2
 }
 
 /* ZSTATUS field in ZACTIVITY is the transaction status */
@@ -105,6 +105,6 @@ export class TrendData {
 
 export class TrendFilter {
     timePeriod: TimePeriod;
-    //yyyyMMdd string
+    // yyyyMMdd string
     startDate: string;
 }

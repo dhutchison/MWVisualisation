@@ -14,7 +14,7 @@ import { SplashModule } from './splash/splash.module';
     AppComponent
   ],
   imports: [
-    DataAccessModule, 
+    DataAccessModule,
     SplashModule,
 
     BrowserModule,
