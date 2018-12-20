@@ -49,10 +49,9 @@ export class TrendPeriodFilterComponent implements OnInit {
   }
 
   private setFilter() {
-    const trendFilter: TrendFilter = {
-      startDate: this.getDateString(this._startDate),
-      timePeriod: TimePeriod[this._timePeriod]
-    };
+    const trendFilter = new TrendFilter();
+    trendFilter.startDate = this.getDateString(this._startDate);
+    trendFilter.timePeriod = TimePeriod[this._timePeriod];
 
     this.filterChanged.emit(trendFilter);
   }

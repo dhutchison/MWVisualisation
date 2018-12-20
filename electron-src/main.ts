@@ -135,10 +135,10 @@ ipcMain.on('loadTransactions', (event: Event, args: any) => {
   }
 });
 
-ipcMain.on('loadIncomeTrend', (event: Event, args: TrendFilter) => {
+ipcMain.on('loadTransactionTrend', (event: Event, args: TrendFilter) => {
   if (dao) {
     /* Only process the request if the DAO has been setup */
-    dao.loadBucketTypeTrend(args, BucketType.Income)
+    dao.loadTransactionTrend(args)
       .then(result => {
         console.log('Loaded income trend');
         console.log(result);
@@ -146,22 +146,6 @@ ipcMain.on('loadIncomeTrend', (event: Event, args: TrendFilter) => {
         event.returnValue = result;
       }, (error) => {
         console.log('Failed to load income trend: ');
-        console.log(error);
-      });
-  }
-});
-
-ipcMain.on('loadExpenseTrend', (event: Event, args: TrendFilter) => {
-  if (dao) {
-    /* Only process the request if the DAO has been setup */
-    dao.loadBucketTypeTrend(args, BucketType.Expense)
-      .then(result => {
-        console.log('Loaded expense trend');
-        console.log(result);
-
-        event.returnValue = result;
-      }, (error) => {
-        console.log('Failed to load expense trend: ');
         console.log(error);
       });
   }

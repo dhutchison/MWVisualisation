@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TrendData, TrendFilter } from 'src/app/data-access/data-access.model';
+import { TrendData, TrendFilter, TrendFilterGroup, BucketType } from 'src/app/data-access/data-access.model';
 import { DataAccessService } from 'src/app/data-access/data-access.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { DataAccessService } from 'src/app/data-access/data-access.service';
 })
 export class ExpenseTrendComponent implements OnInit {
 
-  private trendData: TrendData[];
+  trendData: TrendData[];
 
   constructor(
     private _dataAccessService: DataAccessService
@@ -19,7 +19,12 @@ export class ExpenseTrendComponent implements OnInit {
   }
 
   onFilterChanged(filter: TrendFilter): void {
-    this._dataAccessService.loadExpenseTrend(filter)
+
+    /* Add in screen-specific config */
+    filter.grouping = TrendFilterGroup.Bucket;
+    filter.groupingFilter = BucketType.Expense;
+
+    this._dataAccessService.loadTransactionTrend(filter)
       .then((value) => {
         console.log('Data Loaded');
         console.log(value);

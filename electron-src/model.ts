@@ -69,6 +69,8 @@ export class Transaction {
     status: TransactionStatus;
     type: TransactionType;
 
+    transferSiblingId: number;
+
     bucketId: number;
     memo: string;
     tags: number[] = [];
@@ -106,4 +108,12 @@ export class TrendFilter {
     timePeriod: TimePeriod;
     // yyyyMMdd string
     startDate: string;
+
+    grouping: TrendFilterGroup;
+    groupingFilter: number;
+}
+
+export enum TrendFilterGroup {
+    Account,
+    Bucket
 }

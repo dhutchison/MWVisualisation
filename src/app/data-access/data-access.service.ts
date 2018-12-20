@@ -58,17 +58,9 @@ export class DataAccessService {
     });
   }
 
-  loadIncomeTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
-    return this.loadBucketTrend(trendFilter, 'loadIncomeTrend');
-  }
-
-  loadExpenseTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
-    return this.loadBucketTrend(trendFilter, 'loadExpenseTrend');
-  }
-
-  private loadBucketTrend(trendFilter: TrendFilter, serviceMethod: string): Promise<TrendData[]> {
+  loadTransactionTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
     return new Promise<TrendData[]>((resolve, reject) => {
-      const result = this._electronService.ipcRenderer.sendSync(serviceMethod, trendFilter);
+      const result = this._electronService.ipcRenderer.sendSync('loadTransactionTrend', trendFilter);
       resolve(result);
     });
   }

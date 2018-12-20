@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import * as pallete from 'google-palette';
-
-import { Chart, ChartDataSets } from 'chart.js';
 import { DataAccessService } from 'src/app/data-access/data-access.service';
-import { TrendData, TimePeriod, DateTotal, TrendFilter } from 'src/app/data-access/data-access.model';
+import { TrendData, TrendFilter, TrendFilterGroup, BucketType } from 'src/app/data-access/data-access.model';
 
 @Component({
   selector: 'app-income-trend',
@@ -13,7 +10,7 @@ import { TrendData, TimePeriod, DateTotal, TrendFilter } from 'src/app/data-acce
 })
 export class IncomeTrendComponent implements OnInit {
 
-  private trendData: TrendData[];
+  trendData: TrendData[];
 
   constructor(
     private _dataAccessService: DataAccessService
@@ -22,8 +19,14 @@ export class IncomeTrendComponent implements OnInit {
   ngOnInit() {
   }
 
-  onFilterChanged(filter: TrendFilter): void{
-    this._dataAccessService.loadIncomeTrend(filter)
+  onFilterChanged(filter: TrendFilter): void {
+
+    /* Add in screen-specific config */
+    filter.grouping = TrendFilterGroup.Bucket;
+    filter.groupingFilter = BucketType.Income;
+
+    /* Load the data */
+    this._dataAccessService.loadTransactionTrend(filter)
       .then((value) => {
         console.log('Data Loaded');
         console.log(value);

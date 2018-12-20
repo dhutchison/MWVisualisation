@@ -107,4 +107,12 @@ export class TrendFilter {
     timePeriod: TimePeriod;
     // yyyyMMdd string
     startDate: string;
+
+    grouping: TrendFilterGroup;
+    groupingFilter: number;
+}
+
+export enum TrendFilterGroup {
+    Account,
+    Bucket
 }

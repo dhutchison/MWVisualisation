@@ -11,10 +11,18 @@ import {
     TimePeriod,
     TrendData,
     TrendFilter,
-    BucketType
+    BucketType,
+    TrendFilterGroup
   } from './model';
 
 /* Notes:
+
+This SQLITE DB is created by the iOS Core Data framework, so there
+are some standard columns in each table:
+(From https://stackoverflow.com/questions/8448338/what-is-z-ent-column-in-sqlite-database-that-gets-created-by-core-data)
+* Z_OPT is for how many times the record has been altered
+* Z_PK is the unique id for each
+* Z_ENT is their entity id (same as what’s listed in the Z_PRIMARYKEY table
 
 ZACTIVITY has two columns holding the currency for a transaction:
 - zsalecurrencycode
@@ -23,6 +31,12 @@ The latter seems to be the correct one, the former is only populated for a few
 transactions with a null ZSTATUS
 BUT this does not appear to be a field which is in the UI.
 Just going to use the account currency (ZCURRENCYCODE in ZACCOUNT)
+
+Transfers between accounts are indicated in the ZACTIVITY table by the ZTRANSFERSIBLING
+column. This holds the Z_PK value for the transaction which it is linked to.
+The direction of the tranfer is dictated by the amount and by no other column.
+The source is the transaction with the negative amount, and the destination the transaction
+with the positive amount.
 
 Attempt at getting a total:
 select a.Z_PK as id, a.ZNAME as name,
@@ -116,11 +130,13 @@ export class MoneyWellDAO {
         return this.all(query, queryParams);
     }
 
-    loadBucketTypeTrend(trendFilter: TrendFilter, bucketType: BucketType): Promise<TrendData[]> {
+    loadTransactionTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
 
       /* Setup the query parameters */
       const queryParams: any[] = [];
-      queryParams.push(bucketType);
+      if (trendFilter.groupingFilter) {
+        queryParams.push(trendFilter.groupingFilter);
+      }
       queryParams.push(TransactionStatus.Voided);
       queryParams.push(trendFilter.startDate);
 
@@ -144,18 +160,30 @@ export class MoneyWellDAO {
           break;
       }
 
-      const query =
-        'SELECT b.Z_PK AS bucketId, b.ZNAME AS bucketName, ' +
-        dateQueryPart + ' AS date, ' +
+      let query = 'SELECT ';
+
+      if (trendFilter.grouping === TrendFilterGroup.Bucket) {
+        query += 'b.Z_PK AS groupId, b.ZNAME AS groupName, ';
+      } else if (trendFilter.grouping === TrendFilterGroup.Account) {
+        query += 'a.Z_PK as groupId, a.ZNAME as groupName, ';
+      }
+      query += dateQueryPart + ' AS date, ' +
         'ROUND(TOTAL(t.ZAMOUNT), 2) AS total ' +
         'FROM ZBUCKET b ' +
         'INNER JOIN ZACTIVITY t ON b.Z_PK = t.ZBUCKET2 ' +
         'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK ' +
-        'WHERE b.ZTYPE = ? ' +
-        'AND a.ZINCLUDEINCASHFLOW=1 ' +
+        'WHERE a.ZINCLUDEINCASHFLOW=1 ';
+
+      if (trendFilter.groupingFilter) {
+        if (trendFilter.grouping === TrendFilterGroup.Bucket) {
+         query += 'AND b.ZTYPE = ? ';
+        }
+      }
+
+      query +=
         'AND ZSTATUS != ?  ' +
         'AND t.ZDATEYMD > ? ' +
-        'GROUP BY b.Z_PK, ' + dateQueryPart + ' ' +
+        'GROUP BY groupId, ' + dateQueryPart + ' ' +
         'ORDER BY t.ZDATEYMD';
 
       console.log('Loading income trend data');
@@ -168,21 +196,21 @@ export class MoneyWellDAO {
         this.db.each(query, queryParams,
           (err: Error, row: any) => {
 
-            let bucketData: TrendData = results.get(row.bucketId);
-            if (bucketData === undefined) {
+            let groupData: TrendData = results.get(row.groupId);
+            if (groupData === undefined) {
               /* Not seen this bucket before, create the holder object */
-              bucketData = new TrendData();
-              bucketData.label = row.bucketName;
-              bucketData.dataPoints = [];
+              groupData = new TrendData();
+              groupData.label = row.groupName;
+              groupData.dataPoints = [];
 
-              results.set(row.bucketId, bucketData);
+              results.set(row.groupId, groupData);
             }
 
             const dateTotal = new DateTotal();
             dateTotal.date = row.date;
             dateTotal.total = row.total;
 
-            bucketData.dataPoints.push(dateTotal);
+            groupData.dataPoints.push(dateTotal);
 
           }, (err: Error, count: number) => {
             if (err) {
@@ -214,6 +242,7 @@ export class MoneyWellDAO {
           'WHERE t.ZACCOUNT2 in ( ' + params.accounts.map(() => '?').join(',') + ')' +
           (params.dateRange && params.dateRange.start ? ' AND t.ZDATEYMD >= ? ' : '') +
           (params.dateRange && params.dateRange.end ? ' AND t.ZDATEYMD <= ? ' : '') +
+          /* Exclude the parent of any split transactions to avoid double counting */
           'AND ZSPLITPARENT IS NULL ' +
           'GROUP BY t.ZACCOUNT2';
 
