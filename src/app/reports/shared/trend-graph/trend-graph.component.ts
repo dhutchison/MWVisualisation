@@ -16,6 +16,8 @@ export class TrendGraphComponent implements OnInit {
   @ViewChild('trendChart') myChartRef: ElementRef;
   private chartObj: Chart;
 
+  @Input() stacked = true;
+
   constructor() { }
 
   ngOnInit() {
@@ -95,10 +97,10 @@ export class TrendGraphComponent implements OnInit {
         options: {
           scales: {
             xAxes: [{
-              stacked: true
+              stacked: this.stacked
             }],
             yAxes: [{
-              stacked: true
+              stacked: this.stacked
             }]
           }
         }

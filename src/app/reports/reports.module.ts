@@ -34,15 +34,16 @@ import { TransactionEditorComponent } from './transaction-list/transaction-edito
 import { AccountsService } from './filter/accounts/accounts.service';
 import { TransactionsService } from './transactions.service';
 import { IncomeTrendComponent } from './income-trend/income-trend.component';
-import { TrendPeriodFilterComponent } from './filter/trend-period-filter/trend-period-filter.component';
-import { TrendGraphComponent } from './trend-graph/trend-graph.component';
+import { TrendPeriodFilterComponent } from './shared/trend-period-filter/trend-period-filter.component';
+import { TrendGraphComponent } from './shared/trend-graph/trend-graph.component';
 import { ExpenseTrendComponent } from './expense-trend/expense-trend.component';
+import { TransactionsComponent } from './transactions/transactions.component';
 
 const routes: Routes = [
   { path: '', component: ReportsComponent, children: [
     { path: 'cash-flow', component: InOutReportComponent },
     { path: 'bucket-summary', component: BucketSummaryComponent },
-    { path: 'transactions', component: TransactionListComponent },
+    { path: 'transactions', component: TransactionsComponent },
     { path: 'net-worth', component : NetWorthComponent },
     { path: 'income-trend', component: IncomeTrendComponent },
     { path: 'expense-trend', component: ExpenseTrendComponent }
@@ -94,6 +95,7 @@ const routes: Routes = [
     TrendPeriodFilterComponent,
     TrendGraphComponent,
     ExpenseTrendComponent,
+    TransactionsComponent,
   ],
   providers: [
     AccountsService,

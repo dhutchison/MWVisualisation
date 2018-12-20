@@ -1,12 +1,11 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Input } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { TransactionsService } from '../transactions.service';
 import { Transaction, Account } from '../../data-access/data-access.model';
 import { Subscription } from 'rxjs';
 
 import { MatSort, MatTableDataSource } from '@angular/material';
-import { AccountsService } from '../filter/accounts/accounts.service';
+import { DataAccessService } from 'src/app/data-access/data-access.service';
 
 @Component({
   selector: 'app-transaction-list',
@@ -16,42 +15,43 @@ import { AccountsService } from '../filter/accounts/accounts.service';
 export class TransactionListComponent implements OnInit, OnDestroy {
 
   readonly displayedColumns: string[] = ['date', 'payee', 'amount'];
-  transactions: Transaction[] = [];
+
+  private _accountsSubscription: Subscription;
+  private _transactions: Transaction[] = [];
 
   readonly accounts: Map<number, Account> = new Map();
 
-  dataSource = new MatTableDataSource(this.transactions);
+  dataSource = new MatTableDataSource(this._transactions);
   selection = new SelectionModel<Transaction>(false, [], true);
 
   @ViewChild(MatSort) sort: MatSort;
 
-  private _accountsSubscription: Subscription;
-  private _transactionsSubscription: Subscription;
-
   constructor(
-    private _transactionService: TransactionsService,
-    private _accountsService: AccountsService) { }
+      private dataAccessService: DataAccessService
+    ) { }
 
   ngOnInit() {
 
-    this.dataSource.sort = this.sort;
-
-    this._accountsSubscription = this._accountsService.selectedAccountsSubject.subscribe(
+    this._accountsSubscription = this.dataAccessService.accounts.subscribe(
       (accounts) => {
-        /* Could clear the existing values, but we are not too bothered if this holds more values */
+        this.accounts.clear();
         accounts.forEach((value) => this.accounts.set(value.id, value));
       }
     );
 
-    this._transactionsSubscription = this._transactionService.transactions.subscribe(
-      (transactions) => {
-        this.transactions = transactions;
-        this.dataSource.data = this.transactions;
-      });
+    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy() {
-    this._transactionsSubscription.unsubscribe();
+    this._accountsSubscription.unsubscribe();
+  }
+
+  @Input()
+  set transactions(value: Transaction[]) {
+    /* Ensure the supplied array is non-null */
+    this._transactions = ((value) ? value : []);
+    /* Set the datasource for the table */
+    this.dataSource.data = this._transactions;
   }
 
   getCurrency(transaction?: Transaction): string {
@@ -74,11 +74,8 @@ export class TransactionListComponent implements OnInit, OnDestroy {
 
   getTotal(): number {
 
-    return this.transactions
+    return this._transactions
       .map(t => t.amount)
       .reduce((total, value) => total + value, 0);
   }
-
-
-
 }
