@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { TimePeriod, TrendFilter } from 'src/app/data-access/data-access.model';
+import { TimePeriod, TrendFilter, TrendFilterGroup } from 'src/app/data-access/data-access.model';
 
 @Component({
   selector: 'app-trend-period-filter',
@@ -9,6 +9,7 @@ import { TimePeriod, TrendFilter } from 'src/app/data-access/data-access.model';
 export class TrendPeriodFilterComponent implements OnInit {
 
   private _timePeriod = 'YEAR';
+  private _groupingType = 'Bucket';
   private _startDate: Date = new Date(new Date().getFullYear() - 1, 0, 1);
 
   @Output() filterChanged = new EventEmitter<TrendFilter>();
@@ -23,6 +24,10 @@ export class TrendPeriodFilterComponent implements OnInit {
     return Object.keys(TimePeriod).filter(k => typeof TimePeriod[k as any] === 'number');
   }
 
+  getGroupingTypes(): string[] {
+    return Object.keys(TrendFilterGroup).filter(k => typeof TrendFilterGroup[k as any] === 'number');
+  }
+
   get timePeriod() {
     return this._timePeriod;
   }
@@ -33,6 +38,20 @@ export class TrendPeriodFilterComponent implements OnInit {
     console.log('Setting to ');
     console.log(timePeriod);
     console.log(TimePeriod[timePeriod]);
+
+    this.setFilter();
+  }
+
+  get groupingType() {
+    return this._groupingType;
+  }
+
+  set groupingType(groupingType: string) {
+    this._groupingType = groupingType;
+
+    console.log('Setting groupingType to ');
+    console.log(groupingType);
+    console.log(TrendFilterGroup[groupingType]);
 
     this.setFilter();
   }
@@ -52,6 +71,7 @@ export class TrendPeriodFilterComponent implements OnInit {
     const trendFilter = new TrendFilter();
     trendFilter.startDate = this.getDateString(this._startDate);
     trendFilter.timePeriod = TimePeriod[this._timePeriod];
+    trendFilter.grouping = TrendFilterGroup[this._groupingType];
 
     this.filterChanged.emit(trendFilter);
   }

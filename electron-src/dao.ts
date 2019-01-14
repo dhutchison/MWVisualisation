@@ -134,11 +134,11 @@ export class MoneyWellDAO {
 
       /* Setup the query parameters */
       const queryParams: any[] = [];
+      queryParams.push(TransactionStatus.Voided);
+      queryParams.push(trendFilter.startDate);
       if (trendFilter.groupingFilter) {
         queryParams.push(trendFilter.groupingFilter);
       }
-      queryParams.push(TransactionStatus.Voided);
-      queryParams.push(trendFilter.startDate);
 
       /* Setup the grouping part of the query for the time period */
       let dateQueryPart: string;
@@ -163,26 +163,34 @@ export class MoneyWellDAO {
       let query = 'SELECT ';
 
       if (trendFilter.grouping === TrendFilterGroup.Bucket) {
-        query += 'b.Z_PK AS groupId, b.ZNAME AS groupName, ';
+        query += 'IFNULL(b.Z_PK, -1) AS groupId, IFNULL(b.ZNAME, \'(No Bucket)\') AS groupName, ';
       } else if (trendFilter.grouping === TrendFilterGroup.Account) {
         query += 'a.Z_PK as groupId, a.ZNAME as groupName, ';
       }
       query += dateQueryPart + ' AS date, ' +
         'ROUND(TOTAL(t.ZAMOUNT), 2) AS total ' +
-        'FROM ZBUCKET b ' +
-        'INNER JOIN ZACTIVITY t ON b.Z_PK = t.ZBUCKET2 ' +
-        'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK ' +
-        'WHERE a.ZINCLUDEINCASHFLOW=1 ';
+        //TODO: Won't include transactions without a bucket, add uncategorised option
+        'FROM ZACTIVITY t ' +
+        'LEFT OUTER JOIN ZBUCKET b ON b.Z_PK = t.ZBUCKET2 ' +
+        'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK AND a.ZINCLUDEINCASHFLOW=1 ' +
+        /* we only want to include transfers if they are to an account not 
+         * being included in the cash flow */
+        'LEFT OUTER JOIN ZACTIVITY t2 ON t.ZTRANSFERSIBLING = t2.Z_PK ' + 
+        'LEFT OUTER JOIN ZACCOUNT a2 ON t2.ZACCOUNT2 = a2.Z_PK AND a2.ZINCLUDEINCASHFLOW=1 ' +
+
+        /* Where condititions */
+        'WHERE t.ZSTATUS != ?  ' +
+        'AND t.ZDATEYMD > ? ' + 
+        'AND a2.Z_PK IS NULL ';
 
       if (trendFilter.groupingFilter) {
-        if (trendFilter.grouping === TrendFilterGroup.Bucket) {
+        // TODO: Rename as bucketTypeFilter
+        // if (trendFilter.grouping === TrendFilterGroup.Bucket) {
          query += 'AND b.ZTYPE = ? ';
-        }
+        // }
       }
 
       query +=
-        'AND ZSTATUS != ?  ' +
-        'AND t.ZDATEYMD > ? ' +
         'GROUP BY groupId, ' + dateQueryPart + ' ' +
         'ORDER BY t.ZDATEYMD';
 
@@ -335,6 +343,51 @@ export class MoneyWellDAO {
     console.log(queryParams);
 
     return this.all(query, queryParams);
+
+  }
+
+  /**
+   * Method to load statistics for any accounts with "mortgage" in the name. 
+   * 
+   * This makes a few assumptions, to make up for a lack of information stored in the source
+   * data set:
+   * 1. The expected mortgage end date will be marked with a transaction with the name "END"
+   *    with a zero amount
+   * 2. The approach to estimating what the interest rates applied will be a bit crude.
+   *    This assumes any withdrawal type transactions are for interest
+   *    This assumes any interest transaction will be on the last day of the month
+   *    This is calculated by taking 12 interest transactions and working out two
+   *    pieces of information: the daily interest, and the amount the daily interest decreases
+   *    per month.
+   * 
+   * 
+   * TODO: Develop
+   */
+  private loadMortgageStatistics() {
+
+    /* Load the transactions for any mortgage accounts to give our balance trend. 
+       This will aggregate any transactions which occurred on the same day.
+    */
+    const transactionQuery = 
+      'SELECT a.Z_PK AS accountId, a.ZNAME AS accountName, ' +
+      't.ZDATEYMD AS transactionDate, SUM(t.ZAMOUNT) AS dailyTransactionTotal ' +
+      'FROM ZACTIVITY t ' +
+      'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK AND a.ZNAME LIKE \'%MORTGAGE%\' ' +
+      'GROUP BY a.Z_PK, t.ZDATEYMD ' +
+      'ORDER BY a.Z_PK, t.ZDATEYMD';
+
+
+      /* For a single account, get the last 12 interest amounts */
+      const accountInterestQuery = 
+        'SELECT t.ZDATEYMD AS transactionDate, SUM(t.ZAMOUNT) AS dailyTransactionTotal ' +
+        'FROM ZACTIVITY t ' +
+        'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK AND a.ZNAME LIKE \'%MORTGAGE%\' ' +
+        'WHERE t.ZTYPE=1 ' +
+        'AND t.ZDATEYMD < CAST(strftime(\'%Y%m%d\', \'now\') AS int) ' +
+        'AND t.ZACCOUNT2 = 8 ' +
+        'GROUP BY a.Z_PK, t.ZDATEYMD ' +
+        'ORDER BY a.Z_PK, t.ZDATEYMD DESC ' +
+        'LIMIT 12';
 
   }
 

@@ -22,7 +22,6 @@ export class IncomeTrendComponent implements OnInit {
   onFilterChanged(filter: TrendFilter): void {
 
     /* Add in screen-specific config */
-    filter.grouping = TrendFilterGroup.Bucket;
     filter.groupingFilter = BucketType.Income;
 
     /* Load the data */

@@ -21,7 +21,6 @@ export class ExpenseTrendComponent implements OnInit {
   onFilterChanged(filter: TrendFilter): void {
 
     /* Add in screen-specific config */
-    filter.grouping = TrendFilterGroup.Bucket;
     filter.groupingFilter = BucketType.Expense;
 
     this._dataAccessService.loadTransactionTrend(filter)
