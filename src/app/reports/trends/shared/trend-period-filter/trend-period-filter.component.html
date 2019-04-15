@@ -1,0 +1,7 @@
+<p-fieldset legend="Options">
+
+  <p-calendar placeholder="Choose a date" [(ngModel)]="startDate" [showIcon]="true"></p-calendar>
+
+  <p-dropdown [options]="timePeriods" [(ngModel)]="timePeriod"></p-dropdown>
+  <p-dropdown [options]="groupingTypes" [(ngModel)]="groupingType"></p-dropdown>
+</p-fieldset>

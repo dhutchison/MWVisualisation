@@ -19,11 +19,8 @@ import { TransactionFilterComponent } from './filter/transaction-filter/transact
 import { AccountListComponent } from './filter/accounts/account-list/account-list.component';
 import { AccountsService } from './filter/accounts/accounts.service';
 import { TransactionsService } from './transactions.service';
-import { IncomeTrendComponent } from './income-trend/income-trend.component';
-import { TrendPeriodFilterComponent } from './shared/trend-period-filter/trend-period-filter.component';
-import { TrendGraphComponent } from './shared/trend-graph/trend-graph.component';
-import { ExpenseTrendComponent } from './expense-trend/expense-trend.component';
 import { TransactionsComponent } from './transactions/transactions.component';
+import { TrendsModule } from './trends/trends.module';
 
 const routes: Routes = [
   { path: '', component: ReportsComponent, children: [
@@ -31,8 +28,7 @@ const routes: Routes = [
     { path: 'bucket-summary', component: BucketSummaryComponent },
     { path: 'transactions', component: TransactionsComponent },
     { path: 'net-worth', component : NetWorthComponent },
-    { path: 'income-trend', component: IncomeTrendComponent },
-    { path: 'expense-trend', component: ExpenseTrendComponent }
+    { path: 'trends', loadChildren: './trends/trends.module#TrendsModule' }
   ]}
 ];
 
@@ -43,6 +39,8 @@ const routes: Routes = [
 
     FormsModule,
     ReactiveFormsModule,
+
+    TrendsModule,
 
     /* PrimeNG components */
     CalendarModule,
@@ -66,10 +64,6 @@ const routes: Routes = [
     ReportsComponent,
     TransactionFilterComponent,
     TransactionListComponent,
-    IncomeTrendComponent,
-    TrendPeriodFilterComponent,
-    TrendGraphComponent,
-    ExpenseTrendComponent,
     TransactionsComponent,
   ],
   providers: [
