@@ -1,38 +1,20 @@
 <div class="example-container mat-elevation-z8">
-  <table mat-table [dataSource]="dataSource" matSort>
 
-    <!--- Note that these columns can be defined in any order.
-        The actual rendered columns are set as a property on the row definition" -->
 
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> No. </th>
-      <td mat-cell *matCellDef="let element"> {{ element.id }} </td>
-      <td mat-footer-cell *matFooterCellDef></td>
-    </ng-container>
-
-    <ng-container matColumnDef="payee">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Payee </th>
-      <td mat-cell *matCellDef="let element"> {{ element.payee }} </td>
-      <td mat-footer-cell *matFooterCellDef></td>
-    </ng-container>
-
-    <ng-container matColumnDef="amount">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
-      <td mat-cell *matCellDef="let element"> {{ element.amount | currency: getCurrency(element) }} </td>
-      <td mat-footer-cell *matFooterCellDef> {{ getTotal() | currency: getCurrency() }} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="date">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
-      <td mat-cell *matCellDef="let element"> {{ element.date }} </td>
-      <td mat-footer-cell *matFooterCellDef> Total </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row 
-      *matRowDef="let row; columns: displayedColumns;" 
-      [ngClass]="{'selected': selection.isSelected(row)}"
-      (click)="selection.toggle(row)"></tr>
-    <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
-  </table>
+    <p-table [value]="transactions">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Date</th>
+                <th>Payee</th>
+                <th>Amount</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-transaction>
+            <tr>
+                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.payee }}</td>
+                <td>{{ transaction.amount }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>

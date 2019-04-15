@@ -1,10 +1,11 @@
 <h2 class="accounts-header">Accounts</h2>
 
 <div *ngIf="accounts.length > 0">
-  <mat-selection-list (selectionChange)="onSelectionChanged($event)" #accountSelection>
-    <mat-list-option *ngFor="let account of accounts" [value]="account">
-      <p><mat-icon [inline]="true">{{ getIconName(account) }}</mat-icon>  {{ account.name }}</p>
-    </mat-list-option>
-  </mat-selection-list>
+  <p-listbox 
+    [options]="accounts" 
+    [multiple]="true"
+    [checkbox]="true"
+    [(ngModel)]="selectedAccounts">
+  </p-listbox>
 
 </div>

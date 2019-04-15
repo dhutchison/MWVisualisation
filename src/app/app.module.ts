@@ -1,7 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FlexLayoutModule } from '@angular/flex-layout';
-import { LayoutModule } from '@angular/cdk/layout';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
@@ -19,12 +17,9 @@ import { SplashModule } from './splash/splash.module';
 
     BrowserModule,
     BrowserAnimationsModule,
-    FlexLayoutModule,
 
     /* Routing support */
     AppRoutingModule,
-
-    LayoutModule
   ],
   providers: [
   ],

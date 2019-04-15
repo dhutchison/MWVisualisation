@@ -1,20 +1,26 @@
-import { Component } from '@angular/core';
-import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css']
 })
-export class ReportsComponent {
+export class ReportsComponent implements OnInit {
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(result => result.matches)
-    );
+  menuItems: MenuItem[];
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  constructor() {}
 
+  ngOnInit(): void {
+    this.menuItems = [
+      { label: 'Cash Flow', routerLink: '/reports/cash-flow' },
+      { label: 'Bucket Summary', routerLink: '/reports/bucket-summary' },
+      { label: 'Transactions', routerLink: '/reports/transactions' },
+      { label: 'Net Worth', routerLink: '/reports/net-worth' },
+      { label: 'Income Trend', routerLink: '/reports/income-trend' },
+      { label: 'Expense Trend', routerLink: '/reports/expense-trend' }
+    ];
   }
+
+}

@@ -1,37 +1,9 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav
-    #drawer
-    class="sidenav"
-    fixedInViewport="true"
-    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="!(isHandset$ | async)">
-    <mat-toolbar color="primary">Menu</mat-toolbar>
-    <mat-nav-list>
-      <a mat-list-item routerLink="/reports/cash-flow">Cash Flow</a>
-      <a mat-list-item routerLink="/reports/bucket-summary">Bucket Summary</a>
-      <a mat-list-item routerLink="/reports/transactions">Transactions</a>
-      <a mat-list-item routerLink="/reports/net-worth">Net Worth</a>
-      <a mat-list-item routerLink="/reports/income-trend">Income Trend</a>
-      <a mat-list-item routerLink="/reports/expense-trend">Expense Trend</a>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <mat-toolbar color="primary">
-      <button
-        type="button"
-        aria-label="Toggle sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()"
-        *ngIf="isHandset$ | async">
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-      </button>
-      <span>MW-Visualisation</span>
-    </mat-toolbar>
-    
-    <!-- Page content -->
-    <div>
-      <router-outlet></router-outlet>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+<div>
+  <p-tabMenu [model]="menuItems"></p-tabMenu>
+
+  <!-- Page content -->
+
+  <div>
+    <router-outlet></router-outlet>
+  </div>
+</div>

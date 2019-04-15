@@ -3,25 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
-import { NgxMatDrpModule } from 'ngx-mat-daterange-picker';
-
-import {
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatListModule,
-    MatGridListModule,
-    MatIconModule,
-    MatInputModule,
-    MatRadioModule,
-    MatSelectModule,
-    MatSidenavModule,
-    MatSortModule,
-    MatTableModule,
-    MatTabsModule,
-    MatToolbarModule
-  } from '@angular/material';
+import { CalendarModule } from 'primeng/calendar';
+import { CardModule } from 'primeng/card';
+import { ListboxModule } from 'primeng/listbox';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { TableModule } from 'primeng/table';
+import { TabMenuModule } from 'primeng/tabmenu';
 
 import { BucketSummaryComponent } from './bucket-summary/bucket-summary.component';
 import { InOutReportComponent } from './in-out-report/in-out-report.component';
@@ -30,7 +17,6 @@ import { ReportsComponent } from './reports.component';
 import { TransactionListComponent } from './transaction-list/transaction-list.component';
 import { TransactionFilterComponent } from './filter/transaction-filter/transaction-filter.component';
 import { AccountListComponent } from './filter/accounts/account-list/account-list.component';
-import { TransactionEditorComponent } from './transaction-list/transaction-editor/transaction-editor.component';
 import { AccountsService } from './filter/accounts/accounts.service';
 import { TransactionsService } from './transactions.service';
 import { IncomeTrendComponent } from './income-trend/income-trend.component';
@@ -58,25 +44,15 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
 
-    /* Material date range picker component */
-    NgxMatDrpModule,
+    /* PrimeNG components */
+    CalendarModule,
+    CardModule,
+    ListboxModule,
+    RadioButtonModule,
+    TableModule,
+    TabMenuModule
 
-    /* Angular Material Components */
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatGridListModule,
-    MatIconModule,
-    MatInputModule,
-    MatListModule,
-    MatRadioModule,
-    MatSelectModule,
-    MatSidenavModule,
-    MatSortModule,
-    MatTableModule,
-    MatTabsModule,
-    MatToolbarModule,
+
   ],
   exports: [
     RouterModule,
@@ -88,7 +64,6 @@ const routes: Routes = [
     InOutReportComponent,
     NetWorthComponent,
     ReportsComponent,
-    TransactionEditorComponent,
     TransactionFilterComponent,
     TransactionListComponent,
     IncomeTrendComponent,
