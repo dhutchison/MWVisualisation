@@ -59,10 +59,7 @@ export class DataAccessService {
   }
 
   loadTransactionTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
-    return new Promise<TrendData[]>((resolve, reject) => {
-      const result = this._electronService.ipcRenderer.sendSync('loadTransactionTrend', trendFilter);
-      resolve(result);
-    });
+    return this.loadTrendData(trendFilter, 'loadTransactionTrend');
   }
 
   loadAccountInOutSummary(filter: TransactionFilter): Promise<InOutSummary[]> {
@@ -83,12 +80,15 @@ export class DataAccessService {
 
   }
 
-  loadDailyTrend(filter: TransactionFilter): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      const result = this._electronService.ipcRenderer.sendSync('loadDailyAccountBalances', filter);
+  loadNetWorthTrend(trendFilter: TrendFilter): Promise<TrendData[]> {
+    return this.loadTrendData(trendFilter, 'loadNetWorthTrend');
+  }
+
+  private loadTrendData(trendFilter: TrendFilter, dataLoadCommand: string): Promise<TrendData[]> {
+    return new Promise<TrendData[]>((resolve, reject) => {
+      const result = this._electronService.ipcRenderer.sendSync(dataLoadCommand, trendFilter);
       resolve(result);
     });
   }
-
 
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NgxDrpOptions, PresetItem, Range } from 'ngx-mat-daterange-picker';
 import { TransactionsService } from '../../transactions.service';
 
 @Component({
@@ -10,35 +9,23 @@ import { TransactionsService } from '../../transactions.service';
 // TODO: This component should be a form
 export class TransactionFilterComponent implements OnInit {
 
-  range: Range = { fromDate: this.backDate(30), toDate: new Date() };
-  options: NgxDrpOptions;
-  presets: PresetItem[] = [];
+  private dateRange: Date[] = [this.backDate(30), new Date()];
+  presets = [];
 
   constructor(private _transactionsService: TransactionsService) { }
 
   ngOnInit() {
-    const today = new Date();
 
     this.setupPresets();
-    this.options = {
-      presets: this.presets,
-      format: 'mediumDate',
-      range: {fromDate: this.backDate(30), toDate: today},
-      applyLabel: 'Submit',
-      calendarOverlayConfig: {
-        // With these false we end up being able to open loads
-        shouldCloseOnBackdropClick: true,
-        hasBackdrop: true
-      }
-    };
   }
 
   // handler function that receives the updated date range object
-  updateRange(range: Range) {
+  set range(range: Date[]) {
     this.range = range;
     console.log('Got Range');
     console.log(this.range);
-    this._transactionsService.dateRange = this.range;
+
+    this._transactionsService.dateRange = {fromDate: range[0], toDate: range[1]};
   }
 
   private backDate(numOfDays: number): Date {

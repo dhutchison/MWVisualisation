@@ -1,10 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, Input } from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
 
 import { Transaction, Account } from '../../data-access/data-access.model';
 import { Subscription } from 'rxjs';
 
-import { MatSort, MatTableDataSource } from '@angular/material';
 import { DataAccessService } from 'src/app/data-access/data-access.service';
 
 @Component({
@@ -21,11 +19,6 @@ export class TransactionListComponent implements OnInit, OnDestroy {
 
   readonly accounts: Map<number, Account> = new Map();
 
-  dataSource = new MatTableDataSource(this._transactions);
-  selection = new SelectionModel<Transaction>(false, [], true);
-
-  @ViewChild(MatSort) sort: MatSort;
-
   constructor(
       private dataAccessService: DataAccessService
     ) { }
@@ -38,8 +31,6 @@ export class TransactionListComponent implements OnInit, OnDestroy {
         accounts.forEach((value) => this.accounts.set(value.id, value));
       }
     );
-
-    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy() {
@@ -50,8 +41,10 @@ export class TransactionListComponent implements OnInit, OnDestroy {
   set transactions(value: Transaction[]) {
     /* Ensure the supplied array is non-null */
     this._transactions = ((value) ? value : []);
-    /* Set the datasource for the table */
-    this.dataSource.data = this._transactions;
+  }
+
+  get transactions(): Transaction[] {
+    return this._transactions;
   }
 
   getCurrency(transaction?: Transaction): string {

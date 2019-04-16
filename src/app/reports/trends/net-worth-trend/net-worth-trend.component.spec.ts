@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TransactionEditorComponent } from './transaction-editor.component';
+import { NetWorthTrendComponent } from './net-worth-trend.component';
 
-describe('TransactionEditorComponent', () => {
-  let component: TransactionEditorComponent;
-  let fixture: ComponentFixture<TransactionEditorComponent>;
+describe('NetWorthTrendComponent', () => {
+  let component: NetWorthTrendComponent;
+  let fixture: ComponentFixture<NetWorthTrendComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TransactionEditorComponent ]
+      declarations: [ NetWorthTrendComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TransactionEditorComponent);
+    fixture = TestBed.createComponent(NetWorthTrendComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

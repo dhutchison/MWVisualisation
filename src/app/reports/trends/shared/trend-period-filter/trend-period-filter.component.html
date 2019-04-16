@@ -1,0 +1,26 @@
+<p-fieldset legend="Options">
+
+  <div class="p-grid">
+    <div class="p-col-12 p-md-4 p-lg-3">
+      <span class="ui-float-label">
+        <p-calendar id="startDate" placeholder="Choose a date" [(ngModel)]="startDate" [showIcon]="true">
+        </p-calendar>
+        <label for="startDate">Start Date</label>
+      </span>
+    </div>
+
+    <div class="p-col-12 p-md-4 p-lg-3">
+      <span class="ui-float-label">
+        <p-dropdown id="timePeriod" [options]="timePeriods" [(ngModel)]="timePeriod"></p-dropdown>
+        <label for="timePeriod">Time Period</label>
+      </span>
+    </div>
+    <div class="p-col-12 p-md-4 p-lg-3">
+      <span class="ui-float-label">
+        <p-dropdown id="groupingType" [options]="groupingTypes" [(ngModel)]="groupingType"></p-dropdown>
+        <label for="groupingType">Grouping</label>
+      </span>
+    </div>
+  </div>
+
+</p-fieldset>

@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy, Output } from '@angular/core';
 import { AccountsService } from '../accounts.service';
 import { Subscription } from 'rxjs';
-import { MatSelectionListChange } from '@angular/material/list';
 import { Account, AccountType } from '../../../../data-access/data-access.model';
 import { DataAccessService } from '../../../../data-access/data-access.service';
+
+import { SelectItem } from 'primeng/api';
 
 @Component({
   selector: 'app-account-list',
@@ -14,8 +15,10 @@ export class AccountListComponent implements OnInit, OnDestroy {
 
   private accountsSub: Subscription;
 
-  accounts: Account[] = [];
+  accounts: SelectItem[] = [];
   accountFound = 'No Accounts';
+
+  private privSelectedAccounts: Account[] = [];
 
   constructor(
     private _accountsService: AccountsService,
@@ -25,7 +28,18 @@ export class AccountListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.accountsSub = this._dataAccessService.accounts.subscribe(
       (value: Account[]) => {
-        this.accounts = value;
+
+        const newAccounts = [];
+        value.forEach(account => {
+          const selectItem: SelectItem = {
+            label: account.name,
+            icon: this.getIconName(account),
+            value: account
+          };
+          newAccounts.push(selectItem);
+        });
+
+        this.accounts = newAccounts;
         this.accountFound = 'Got Accounts';
         console.log(this.accountFound);
         console.log(this.accounts);
@@ -33,16 +47,14 @@ export class AccountListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onSelectionChanged(event: MatSelectionListChange): void {
+  get selectedAccounts(): Account[] {
+    return this.privSelectedAccounts;
+  }
 
-    const selectedAccounts = [];
+  set selectedAccounts(value: Account[]) {
+    this.privSelectedAccounts = value;
 
-    event.source.selectedOptions.selected.forEach(element => {
-      console.log(element.value);
-      selectedAccounts.push(element.value);
-    });
-
-    this._accountsService.selectedAccounts = selectedAccounts;
+    this._accountsService.selectedAccounts = this.privSelectedAccounts;
   }
 
   getIconName(account: Account): string {
