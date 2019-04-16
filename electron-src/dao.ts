@@ -164,15 +164,21 @@ export class MoneyWellDAO {
 
       if (trendFilter.grouping === TrendFilterGroup.Bucket) {
         query += 'IFNULL(b.Z_PK, -1) AS groupId, IFNULL(b.ZNAME, \'(No Bucket)\') AS groupName, ';
+      } else if (trendFilter.grouping === TrendFilterGroup.Bucket_Group) {
+        query += 'IFNULL(bg.Z_PK, -1) AS groupId, IFNULL(bg.ZNAME, \'(No Bucket Group)\') AS groupName, ';
       } else if (trendFilter.grouping === TrendFilterGroup.Account) {
         query += 'a.Z_PK as groupId, a.ZNAME as groupName, ';
+      } else if (trendFilter.grouping === TrendFilterGroup.Account_Group) {
+        query += 'IFNULL(ag.Z_PK, -1) AS groupId, IFNULL(ag.ZNAME, \'(No Account Group)\') AS groupName, ';
       }
+
       query += dateQueryPart + ' AS date, ' +
         'ROUND(TOTAL(t.ZAMOUNT), 2) AS total ' +
-        //TODO: Won't include transactions without a bucket, add uncategorised option
         'FROM ZACTIVITY t ' +
         'LEFT OUTER JOIN ZBUCKET b ON b.Z_PK = t.ZBUCKET2 ' +
+        'LEFT OUTER JOIN ZBUCKETGROUP bg ON b.ZBUCKETGROUP = bg.Z_PK ' + 
         'INNER JOIN ZACCOUNT a ON t.ZACCOUNT2 = a.Z_PK AND a.ZINCLUDEINCASHFLOW=1 ' +
+        'LEFT OUTER JOIN ZACCOUNTGROUP ag ON a.ZACCOUNTGROUP = ag.Z_PK ' + 
         /* we only want to include transfers if they are to an account not 
          * being included in the cash flow */
         'LEFT OUTER JOIN ZACTIVITY t2 ON t.ZTRANSFERSIBLING = t2.Z_PK ' + 

@@ -115,5 +115,7 @@ export class TrendFilter {
 
 export enum TrendFilterGroup {
     Account,
-    Bucket
+    Account_Group,
+    Bucket,
+    Bucket_Group
 }
