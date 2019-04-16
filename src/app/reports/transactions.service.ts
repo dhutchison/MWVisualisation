@@ -14,10 +14,6 @@ export class TransactionsService {
   readonly transactions = new BehaviorSubject<Transaction[]>([]);
   readonly accountInOutSummary = new BehaviorSubject<InOutSummary[]>([]);
   readonly bucketInOutSummary = new BehaviorSubject<InOutSummary[]>([]);
-  readonly dailyWorthSummary = new BehaviorSubject<DailyWorth>({
-    initialBalance: 0,
-    dailyWorth: []
-  });
 
   /* Date ranges are yyyyMMdd strings */
   private _filter: TransactionFilter = {};
@@ -78,11 +74,6 @@ export class TransactionsService {
     this._dataAccessService.loadBucketInOutSummary(this._filter)
       .then((result) => {
         this.bucketInOutSummary.next(result);
-      });
-
-    this._dataAccessService.loadDailyTrend(this._filter)
-      .then((result) => {
-        this.dailyWorthSummary.next(result);
       });
   }
 }

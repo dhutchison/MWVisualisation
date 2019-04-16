@@ -12,7 +12,6 @@ import { TabMenuModule } from 'primeng/tabmenu';
 
 import { BucketSummaryComponent } from './bucket-summary/bucket-summary.component';
 import { InOutReportComponent } from './in-out-report/in-out-report.component';
-import { NetWorthComponent } from './net-worth/net-worth.component';
 import { ReportsComponent } from './reports.component';
 import { TransactionListComponent } from './transaction-list/transaction-list.component';
 import { TransactionFilterComponent } from './filter/transaction-filter/transaction-filter.component';
@@ -27,7 +26,6 @@ const routes: Routes = [
     { path: 'cash-flow', component: InOutReportComponent },
     { path: 'bucket-summary', component: BucketSummaryComponent },
     { path: 'transactions', component: TransactionsComponent },
-    { path: 'net-worth', component : NetWorthComponent },
     { path: 'trends', loadChildren: './trends/trends.module#TrendsModule' }
   ]}
 ];
@@ -60,7 +58,6 @@ const routes: Routes = [
     AccountListComponent,
     BucketSummaryComponent,
     InOutReportComponent,
-    NetWorthComponent,
     ReportsComponent,
     TransactionFilterComponent,
     TransactionListComponent,

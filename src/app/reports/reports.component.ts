@@ -17,7 +17,7 @@ export class ReportsComponent implements OnInit {
       { label: 'Cash Flow', routerLink: '/reports/cash-flow' },
       { label: 'Bucket Summary', routerLink: '/reports/bucket-summary' },
       { label: 'Transactions', routerLink: '/reports/transactions' },
-      { label: 'Net Worth', routerLink: '/reports/net-worth' },
+      { label: 'Net Worth', routerLink: '/reports/trends/net-worth-trend' },
       { label: 'Income Trend', routerLink: '/reports/trends/income-trend' },
       { label: 'Expense Trend', routerLink: '/reports/trends/expense-trend' }
     ];

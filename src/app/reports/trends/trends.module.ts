@@ -12,10 +12,12 @@ import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { DropdownModule } from 'primeng/dropdown';
 import { FieldsetModule } from 'primeng/fieldset';
+import { NetWorthTrendComponent } from './net-worth-trend/net-worth-trend.component';
 
 const routes: Routes = [
   { path: 'income-trend', component: IncomeTrendComponent },
-  { path: 'expense-trend', component: ExpenseTrendComponent }
+  { path: 'expense-trend', component: ExpenseTrendComponent },
+  { path: 'net-worth-trend', component: NetWorthTrendComponent }
 ];
 
 @NgModule({
@@ -23,7 +25,8 @@ const routes: Routes = [
     ExpenseTrendComponent,
     IncomeTrendComponent,
     TrendGraphComponent,
-    TrendPeriodFilterComponent
+    TrendPeriodFilterComponent,
+    NetWorthTrendComponent
   ],
   imports: [
     RouterModule.forChild(routes),

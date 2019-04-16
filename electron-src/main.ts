@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, Menu, ipcMain, IpcMain, OpenDialogOptions, Event } from 'electron';
 import { MoneyWellDAO } from './dao';
 import * as path from 'path';
-import { TransactionFilter, Account, NetWorth, DateTotal, TimePeriod, TrendFilter, BucketType } from './model';
+import { TransactionFilter, Account, NetWorth, DateTotal, TimePeriod, TrendFilter, BucketType, TrendData, TrendFilterGroup } from './model';
 
 let mainWindow: Electron.BrowserWindow;
 let menu: Electron.Menu;
@@ -175,15 +175,21 @@ ipcMain.on('loadBucketInOutSummary', (event: Event, args: any) => {
   }
 });
 
-ipcMain.on('loadDailyAccountBalances', (event: Event, args: TransactionFilter) => {
-  if (dao && args.dateRange) {
-    dao.loadAccountsWithBalance(args.dateRange.start)
+ipcMain.on('loadNetWorthTrend', (event: Event, args: TrendFilter) => {
+  if (dao) {
+    dao.loadAccountsWithBalance(args.startDate, true)
       .then((result: Account[]) => {
 
 
-        const filterAccountIDs: number[] = args.accounts.map(a => a.id);
+        const filterAccountIDs: number[] = result.map(a => a.id);
 
-        dao.loadDailyTransactionTotals(args)
+        const transactionFilter = new TransactionFilter();
+        transactionFilter.accounts = result;
+        transactionFilter.dateRange = { start: args.startDate };
+
+        args.grouping = TrendFilterGroup.ALL;
+
+        dao.loadTransactionTrend(args)
           .then(totals => {
             /* Get the initial balance for the filter accounts */
             const initialBalance = result
@@ -195,7 +201,8 @@ ipcMain.on('loadDailyAccountBalances', (event: Event, args: TransactionFilter) =
 
             /* Work out the daily worth */
             let runningTotal = initialBalance;
-            const dataPoints: DateTotal[] = totals
+            //TODO: add grouping later
+            const dataPoints: DateTotal[] = totals[0].dataPoints
               .map(value => {
                 runningTotal += value.total;
                 return {
@@ -205,16 +212,17 @@ ipcMain.on('loadDailyAccountBalances', (event: Event, args: TransactionFilter) =
               });
 
             /* Make the response object */
-            const response: NetWorth = {
-              initialBalance: initialBalance,
-              dataPoints: dataPoints
-            };
+            const response: TrendData[] = [
+              {
+                label: 'Total',
+                dataPoints: dataPoints
+              }];
 
             console.log(response);
 
             event.returnValue = response;
           }, (error2) => {
-            console.log('Failed to load daily transaction totals: ');
+            console.log('Failed to load transaction trend details: ');
             console.log(error2);
           });
       }, (error) => {
@@ -224,10 +232,10 @@ ipcMain.on('loadDailyAccountBalances', (event: Event, args: TransactionFilter) =
 
   } else {
     /* Can't load any data */
-    event.returnValue = {
-      initialBalance: 0,
-      dailyWorth: []
-    };
+    event.returnValue = [{
+      label: 'Total',
+      dataPoints: []
+    }];
   }
 });
 

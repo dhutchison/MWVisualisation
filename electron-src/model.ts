@@ -32,8 +32,8 @@ export enum BucketType {
 }
 
 export class DateRange {
-    start: string;
-    end: string;
+    start?: string;
+    end?: string;
 }
 
 export class DateTotal {
@@ -114,6 +114,7 @@ export class TrendFilter {
 }
 
 export enum TrendFilterGroup {
+    ALL,
     Account,
     Account_Group,
     Bucket,
