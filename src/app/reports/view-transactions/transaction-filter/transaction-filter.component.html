@@ -1,0 +1,20 @@
+<p-fieldset legend="Options">
+
+    <div class="p-grid">
+        <div class="p-col-12 p-md-4 p-lg-3">
+            <span class="ui-float-label">
+                <p-calendar id="rangeDates" [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true">
+                </p-calendar>
+                <label for="rangeDates">Date Range</label>
+            </span>
+        </div>
+        <div class="p-col-12 p-md-4 p-lg-3">
+            <span class="ui-float-label">
+
+                <p-multiSelect id="accounts" [options]="accounts" [(ngModel)]="selectedAccounts"
+                    [panelStyle]="{minWidth:'12em'}"></p-multiSelect>
+                <label for="accounts">Accounts</label>
+            </span>
+        </div>
+    </div>
+</p-fieldset>

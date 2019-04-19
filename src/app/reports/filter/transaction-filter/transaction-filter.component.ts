@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TransactionsService } from '../../transactions.service';
 
 @Component({
-  selector: 'app-transaction-filter',
+  selector: 'app-transaction-filter-old',
   templateUrl: './transaction-filter.component.html',
   styleUrls: ['./transaction-filter.component.css']
 })

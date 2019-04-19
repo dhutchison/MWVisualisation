@@ -13,19 +13,18 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { BucketSummaryComponent } from './bucket-summary/bucket-summary.component';
 import { InOutReportComponent } from './in-out-report/in-out-report.component';
 import { ReportsComponent } from './reports.component';
-import { TransactionListComponent } from './transaction-list/transaction-list.component';
 import { TransactionFilterComponent } from './filter/transaction-filter/transaction-filter.component';
 import { AccountListComponent } from './filter/accounts/account-list/account-list.component';
 import { AccountsService } from './filter/accounts/accounts.service';
 import { TransactionsService } from './transactions.service';
-import { TransactionsComponent } from './transactions/transactions.component';
 import { TrendsModule } from './trends/trends.module';
 
 const routes: Routes = [
   { path: '', component: ReportsComponent, children: [
     { path: 'cash-flow', component: InOutReportComponent },
     { path: 'bucket-summary', component: BucketSummaryComponent },
-    { path: 'transactions', component: TransactionsComponent },
+    { path: 'transactions', 
+      loadChildren: './view-transactions/view-transactions.module#ViewTransactionsModule' },
     { path: 'trends', loadChildren: './trends/trends.module#TrendsModule' }
   ]}
 ];
@@ -60,8 +59,6 @@ const routes: Routes = [
     InOutReportComponent,
     ReportsComponent,
     TransactionFilterComponent,
-    TransactionListComponent,
-    TransactionsComponent,
   ],
   providers: [
     AccountsService,
