@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, Input } from '@angular/core';
 
-import { Transaction, Account } from '../../data-access/data-access.model';
 import { Subscription } from 'rxjs';
 
+import { Transaction, Account } from 'src/app/data-access/data-access.model';
 import { DataAccessService } from 'src/app/data-access/data-access.service';
 
 @Component({
@@ -12,7 +12,10 @@ import { DataAccessService } from 'src/app/data-access/data-access.service';
 })
 export class TransactionListComponent implements OnInit, OnDestroy {
 
-  readonly displayedColumns: string[] = ['date', 'payee', 'amount'];
+  readonly displayedColumns = [
+    { field: 'date', header: 'Date' },
+    { field: 'payee', header: 'Payee'},
+    { field: 'amount', header: 'Amount'}];
 
   private _accountsSubscription: Subscription;
   private _transactions: Transaction[] = [];
